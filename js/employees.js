@@ -51,6 +51,7 @@ function renderEmployeeCards(users) {
           <div class="ec-name">${u.name}</div>
           <div class="ec-role">${u.position || u.role}</div>
         </div>
+        ${currentRole === 'admin' ? `
         <div class="ec-menu" onclick="toggleEmpMenu(event, ${u.id})">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
             <circle cx="12" cy="5" r="2.5"></circle>
@@ -66,6 +67,7 @@ function renderEmployeeCards(users) {
             </div>
           </div>
         </div>
+        ` : ''}
       </div>
       <div class="ec-stats">
         <div class="ec-stat-box">
