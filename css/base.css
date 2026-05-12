@@ -4,7 +4,9 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -27,14 +29,29 @@ body {
   height: 100vh;
 }
 
-a { color: var(--text-link); text-decoration: none; }
-a:hover { text-decoration: underline; }
+a {
+  color: var(--text-link);
+  text-decoration: none;
+}
 
-img { max-width: 100%; display: block; }
+a:hover {
+  text-decoration: underline;
+}
 
-ul, ol { list-style: none; }
+img {
+  max-width: 100%;
+  display: block;
+}
 
-input, button, textarea, select {
+ul,
+ol {
+  list-style: none;
+}
+
+input,
+button,
+textarea,
+select {
   font-family: inherit;
   font-size: inherit;
   color: inherit;
@@ -43,15 +60,27 @@ input, button, textarea, select {
   background: none;
 }
 
-button { cursor: pointer; }
+button {
+  cursor: pointer;
+}
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 ::-webkit-scrollbar-thumb {
   background: var(--surface-border);
   border-radius: var(--radius-full);
 }
-::-webkit-scrollbar-thumb:hover { background: var(--surface-border-light); }
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--surface-border-light);
+}
 
 /* ── App Layout ── */
 .app-layout {
@@ -84,7 +113,6 @@ button { cursor: pointer; }
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-5) var(--space-5);
-  border-bottom: 1px solid var(--surface-border);
   min-height: var(--header-height);
 }
 
@@ -469,28 +497,63 @@ html[data-theme="light"] .theme-toggle-icon {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideIn {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
 }
 
 /* ── Login Page ── */
@@ -537,8 +600,15 @@ html[data-theme="light"] .theme-toggle-icon {
 }
 
 @keyframes floatBg {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(40px, -30px); }
+
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  50% {
+    transform: translate(40px, -30px);
+  }
 }
 
 .login-card {
@@ -619,7 +689,9 @@ html[data-theme="light"] .theme-toggle-icon {
   box-shadow: var(--shadow-glow);
 }
 
-.login-form input::placeholder { color: var(--text-tertiary); }
+.login-form input::placeholder {
+  color: var(--text-tertiary);
+}
 
 .login-form .login-btn {
   padding: var(--space-3) var(--space-6);
@@ -648,7 +720,11 @@ html[data-theme="light"] .theme-toggle-icon {
     z-index: var(--z-modal);
     transition: left var(--transition-slow);
   }
-  .sidebar.open { left: 0; }
+
+  .sidebar.open {
+    left: 0;
+  }
+
   .sidebar-overlay {
     display: none;
     position: fixed;
@@ -656,16 +732,32 @@ html[data-theme="light"] .theme-toggle-icon {
     background: var(--bg-overlay);
     z-index: calc(var(--z-modal) - 1);
   }
-  .sidebar.open ~ .sidebar-overlay { display: block; }
-  .header-search { width: 180px; }
+
+  .sidebar.open~.sidebar-overlay {
+    display: block;
+  }
+
+  .header-search {
+    width: 180px;
+  }
 }
 
 @media (max-width: 768px) {
-  .header-search { display: none; }
-  .content { padding: var(--space-4); }
-  .role-selector { display: none; }
+  .header-search {
+    display: none;
+  }
+
+  .content {
+    padding: var(--space-4);
+  }
+
+  .role-selector {
+    display: none;
+  }
 }
 
 @media (max-width: 480px) {
-  .content { padding: var(--space-3); }
+  .content {
+    padding: var(--space-3);
+  }
 }
