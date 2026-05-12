@@ -270,5 +270,51 @@ function renderModals() {
     </div>
   </div>
 </div>
+
+<!-- Edit Employee Modal -->
+<div class="modal-overlay" id="modalEditEmployee">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Xodimni tahrirlash</h3>
+      <button class="modal-close" onclick="closeModal('modalEditEmployee')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editEmpId">
+      <div class="form-group" style="margin-bottom:var(--space-4)">
+        <label class="form-label">To'liq ism *</label>
+        <input type="text" class="form-input" id="editEmpName" placeholder="Xodimning ismini kiriting">
+      </div>
+      <div class="form-group" style="margin-bottom:var(--space-4)">
+        <label class="form-label">Email *</label>
+        <input type="email" class="form-input" id="editEmpEmail" placeholder="Misol: user@taskflow.uz">
+      </div>
+      <div class="form-row" style="margin-bottom:var(--space-4)">
+        <div class="form-group">
+          <label class="form-label">Parol</label>
+          <input type="password" class="form-input" id="editEmpPassword" placeholder="Yangi parol (ixtiyoriy)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Rol</label>
+          <select class="form-select" id="editEmpRole">
+            <option value="employee">Employee (Xodim)</option>
+            <option value="teamlead">Team Lead</option>
+            <option value="pm">Project Manager</option>
+            <option value="hr">HR</option>
+            <option value="admin">Super Admin</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:var(--space-4)">
+        <label class="form-label">Lavozim (Position)</label>
+        <input type="text" class="form-input" id="editEmpPosition" placeholder="Misol: Frontend dasturchi">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalEditEmployee')">Bekor qilish</button>
+      <button class="btn btn-primary" onclick="updateEmployee()">Saqlash</button>
+    </div>
+  </div>
+</div>
   `;
 }
+

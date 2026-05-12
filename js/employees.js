@@ -113,12 +113,69 @@ document.addEventListener('click', () => {
 });
 
 function editEmployee(id) {
-  // TODO: connect to API or open modal
-  showToast('Tahrirlash funksiyasi tayyorlanmoqda', 'info');
+  const user = USERS.find(u => u.id === id);
+  if (!user) return;
+  
+  const modal = document.getElementById('modalEditEmployee');
+  if (!modal) {
+    showToast('Xatolik: Modal topilmadi', 'error');
+    return;
+  }
+  
+  document.getElementById('editEmpId').value = user.id;
+  document.getElementById('editEmpName').value = user.name;
+  document.getElementById('editEmpEmail').value = user.email || '';
+  document.getElementById('editEmpRole').value = user.role;
+  document.getElementById('editEmpPosition').value = user.position || '';
+  document.getElementById('editEmpPassword').value = '';
+  
+  openModal('modalEditEmployee');
+  
+  const dd = document.getElementById(`empDropdown-${id}`);
+  if(dd) dd.classList.remove('show');
+}
+
+async function updateEmployee() {
+  const id = document.getElementById('editEmpId').value;
+  const name = document.getElementById('editEmpName').value.trim();
+  const email = document.getElementById('editEmpEmail').value.trim();
+  const password = document.getElementById('editEmpPassword').value;
+  const role = document.getElementById('editEmpRole').value;
+  const position = document.getElementById('editEmpPosition').value.trim();
+
+  if (!name || !email) {
+    showToast("Ism va email kiritilishi shart", "warning");
+    return;
+  }
+
+  try {
+    const payload = { name, email, role, position };
+    if (password) payload.password = password;
+
+    // TODO: Connect to backend API if available
+    // For now simulate update locally
+    const idx = USERS.findIndex(u => u.id == id);
+    if (idx !== -1) {
+      USERS[idx] = { ...USERS[idx], ...payload };
+    }
+    
+    showToast("Xodim muvaffaqiyatli tahrirlandi!", "success");
+    closeModal('modalEditEmployee');
+    renderEmployees();
+  } catch (error) {
+    showToast(error.message || "Xatolik yuz berdi", "error");
+  }
 }
 
 function deleteEmployee(id) {
-  if (confirm("Rostdan ham ushbu xodimni o'chirmoqchimisiz?")) {
-    showToast("Xodim o'chirildi", 'success');
+  if (confirm("Bu amalni orqaga qaytarib bo'lmaydi. Rostdan ham ushbu xodimni o'chirmoqchimisiz?")) {
+    // TODO: Connect to backend API if available
+    // For now simulate delete locally
+    const idx = USERS.findIndex(u => u.id == id);
+    if (idx !== -1) {
+      USERS.splice(idx, 1);
+      renderEmployees();
+      showToast("Xodim o'chirildi", 'success');
+    }
   }
 }
