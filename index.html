@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="IT kompaniya ichki boshqaruv tizimi — Project and Task Management Platform">
+  <title>TaskFlow — Project Management</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+
+  <!-- Root Containers -->
+  <div id="app-root"></div>
+  <div id="modals-root"></div>
+  
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Layout Components Scripts -->
+  <script src="js/layout/login.js"></script>
+  <script src="js/layout/sidebar.js"></script>
+  <script src="js/layout/header.js"></script>
+  <script src="js/layout/layout.js"></script>
+  <script src="js/modals/modals.js"></script>
+
+  <!-- API Service -->
+  <script src="js/api.js"></script>
+
+  <!-- Main Application Scripts -->
+  <script src="js/data.js?v=3"></script>
+  <script src="js/app.js?v=3"></script>
+  <script src="js/dashboard.js?v=2"></script>
+  <script src="js/projects.js?v=2"></script>
+  <script src="js/tasks.js?v=2"></script>
+  <script src="js/chat.js?v=2"></script>
+  <script src="js/notifications.js?v=2"></script>
+  <script src="js/feedback.js?v=2"></script>
+  <script src="js/employees.js?v=2"></script>
+  <script src="js/settings.js?v=2"></script>
+  <script src="js/login.js?v=2"></script>
+
+  <!-- Component Injector -->
+  <script>
+    document.getElementById('app-root').innerHTML = renderLogin() + renderAppLayout();
+    document.getElementById('modals-root').innerHTML = renderModals();
+  </script>
+</body>
+</html>
