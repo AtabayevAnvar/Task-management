@@ -10,8 +10,7 @@ node_modules/
 *.out.log
 
 # Database files
-*.sqlite
-*.db
+# (Removed to allow taskflow.db to be pushed to GitHub)
 
 # OS files
 .DS_Store
