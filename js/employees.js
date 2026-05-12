@@ -21,7 +21,7 @@ function renderEmployees() {
         <option value="employee">Employee</option>
         <option value="hr">HR</option>
       </select>
-      ${currentRole === 'admin' ? '<button class="btn btn-primary" onclick="openModal(\'modalCreateEmployee\')">+ Xodim qo\'shish</button>' : ''}
+      ${currentRole === 'admin' ? '<button class="btn btn-primary" style="margin-left:auto" onclick="openModal(\'modalCreateEmployee\')">+ Xodim qo\'shish</button>' : ''}
     </div>
 
     <div class="employee-grid" id="employeeGrid">
