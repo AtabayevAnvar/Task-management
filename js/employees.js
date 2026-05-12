@@ -51,12 +51,20 @@ function renderEmployeeCards(users) {
           <div class="ec-name">${u.name}</div>
           <div class="ec-role">${u.position || u.role}</div>
         </div>
-        <div class="ec-menu">
+        <div class="ec-menu" onclick="toggleEmpMenu(event, ${u.id})">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
             <circle cx="12" cy="5" r="2.5"></circle>
             <circle cx="12" cy="12" r="2.5"></circle>
             <circle cx="12" cy="19" r="2.5"></circle>
           </svg>
+          <div class="ec-dropdown" id="empDropdown-${u.id}">
+            <div class="ec-dropdown-item" onclick="editEmployee(${u.id})">
+              ✏️ Tahrirlash
+            </div>
+            <div class="ec-dropdown-item text-danger" onclick="deleteEmployee(${u.id})">
+              🗑️ O'chirish
+            </div>
+          </div>
         </div>
       </div>
       <div class="ec-stats">
@@ -87,4 +95,30 @@ function filterEmployees() {
   
   const grid = document.getElementById('employeeGrid');
   if (grid) grid.innerHTML = renderEmployeeCards(filtered);
+}
+
+// ── Dropdown and actions ──
+function toggleEmpMenu(e, id) {
+  e.stopPropagation();
+  // Close others
+  document.querySelectorAll('.ec-dropdown').forEach(el => {
+    if(el.id !== `empDropdown-${id}`) el.classList.remove('show');
+  });
+  const dd = document.getElementById(`empDropdown-${id}`);
+  if(dd) dd.classList.toggle('show');
+}
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.ec-dropdown').forEach(el => el.classList.remove('show'));
+});
+
+function editEmployee(id) {
+  // TODO: connect to API or open modal
+  showToast('Tahrirlash funksiyasi tayyorlanmoqda', 'info');
+}
+
+function deleteEmployee(id) {
+  if (confirm("Rostdan ham ushbu xodimni o'chirmoqchimisiz?")) {
+    showToast("Xodim o'chirildi", 'success');
+  }
 }
