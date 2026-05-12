@@ -1,6 +1,10 @@
 function renderAppLayout() {
   return `
 <div class="app-layout" id="appLayout" style="display:none;">
+  <!-- Dummy inputs to stop aggressive password managers -->
+  <input type="text" style="width:0;height:0;position:absolute;opacity:0" autocomplete="username">
+  <input type="password" style="width:0;height:0;position:absolute;opacity:0" autocomplete="current-password">
+
   <!-- ── SIDEBAR ── -->
   <aside class="sidebar" id="sidebar">
     ${renderSidebar()}
