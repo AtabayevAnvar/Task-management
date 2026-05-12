@@ -34,8 +34,8 @@ router.post('/login', (req, res) => {
   // Generate JWT
   const token = jwt.sign(
     { id: user.id, email: user.email, role: user.role },
-    process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN }
+    process.env.JWT_SECRET || 'super_secret_key_123_taskflow',
+    { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
   );
 
   res.json({
