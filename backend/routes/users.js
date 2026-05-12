@@ -3,6 +3,7 @@
    ============================================ */
 
 const express = require('express');
+const bcrypt = require('bcryptjs');
 const { dbWrapper: db } = require('../db/database');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 
@@ -47,14 +48,33 @@ router.put('/:id', authMiddleware, (req, res) => {
     return res.status(403).json({ error: 'Ruxsat yo\'q.' });
   }
 
-  const { name, position, email } = req.body;
+  const { name, position, email, role, password } = req.body;
   const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.params.id);
   if (!user) return res.status(404).json({ error: 'Foydalanuvchi topilmadi.' });
 
-  db.prepare('UPDATE users SET name = ?, position = ?, email = ? WHERE id = ?')
-    .run(name || user.name, position || user.position, email || user.email, req.params.id);
+  let newRole = user.role;
+  if (role && req.user.role === 'admin') {
+    newRole = role;
+  }
+
+  let newPassword = user.password;
+  if (password) {
+    newPassword = bcrypt.hashSync(password, 10);
+  }
+
+  db.prepare('UPDATE users SET name = ?, position = ?, email = ?, role = ?, password = ? WHERE id = ?')
+    .run(name || user.name, position || user.position, email || user.email, newRole, newPassword, req.params.id);
 
   res.json({ message: 'Yangilandi.' });
+});
+
+// ── DELETE /api/users/:id ──
+router.delete('/:id', authMiddleware, requireRole('admin'), (req, res) => {
+  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.params.id);
+  if (!user) return res.status(404).json({ error: 'Foydalanuvchi topilmadi.' });
+
+  db.prepare('DELETE FROM users WHERE id = ?').run(req.params.id);
+  res.json({ message: 'Foydalanuvchi o\'chirildi.' });
 });
 
 // ── PUT /api/users/:id/status ──

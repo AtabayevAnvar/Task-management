@@ -103,6 +103,7 @@ const API = {
   async getUsers() { return this.get('/users'); },
   async getUser(id) { return this.get(`/users/${id}`); },
   async updateUser(id, data) { return this.put(`/users/${id}`, data); },
+  async deleteUser(id) { return this.delete(`/users/${id}`); },
 
   // ══════════════════════════════════════
   // PROJECTS

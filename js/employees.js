@@ -152,8 +152,9 @@ async function updateEmployee() {
     const payload = { name, email, role, position };
     if (password) payload.password = password;
 
-    // TODO: Connect to backend API if available
-    // For now simulate update locally
+    await API.updateUser(id, payload);
+
+    // Update local data
     const idx = USERS.findIndex(u => u.id == id);
     if (idx !== -1) {
       USERS[idx] = { ...USERS[idx], ...payload };
@@ -167,15 +168,19 @@ async function updateEmployee() {
   }
 }
 
-function deleteEmployee(id) {
+async function deleteEmployee(id) {
   if (confirm("Bu amalni orqaga qaytarib bo'lmaydi. Rostdan ham ushbu xodimni o'chirmoqchimisiz?")) {
-    // TODO: Connect to backend API if available
-    // For now simulate delete locally
-    const idx = USERS.findIndex(u => u.id == id);
-    if (idx !== -1) {
-      USERS.splice(idx, 1);
+    try {
+      await API.deleteUser(id);
+      
+      const idx = USERS.findIndex(u => u.id == id);
+      if (idx !== -1) {
+        USERS.splice(idx, 1);
+      }
       renderEmployees();
       showToast("Xodim o'chirildi", 'success');
+    } catch (error) {
+      showToast(error.message || "O'chirishda xatolik yuz berdi", "error");
     }
   }
 }
