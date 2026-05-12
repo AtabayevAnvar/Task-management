@@ -42,24 +42,35 @@ function renderEmployeeCards(users) {
     
     return `
     <div class="employee-card">
-      <div class="ec-avatar" style="background:${u.color}">${u.initials}</div>
-      <div class="ec-name">${u.name} ${statusDot}</div>
-      <div class="ec-role">${u.position}</div>
-      <div style="margin-bottom:var(--space-2)">
-        <span class="badge" style="background:rgba(59,130,246,0.12);color:var(--primary-400);font-size:10px">${u.role.toUpperCase()}</span>
+      <div class="ec-header">
+        <div class="ec-avatar-wrapper">
+          <div class="ec-avatar" style="background:${u.color}">${u.initials}</div>
+          <span class="ec-status-dot ${u.status}"></span>
+        </div>
+        <div class="ec-info">
+          <div class="ec-name">${u.name}</div>
+          <div class="ec-role">${u.position || u.role}</div>
+        </div>
+        <div class="ec-menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="12" cy="5" r="2.5"></circle>
+            <circle cx="12" cy="12" r="2.5"></circle>
+            <circle cx="12" cy="19" r="2.5"></circle>
+          </svg>
+        </div>
       </div>
       <div class="ec-stats">
-        <div class="ec-stat">
-          <div class="es-val">${activeTasks}</div>
+        <div class="ec-stat-box">
           <div class="es-label">Aktiv</div>
+          <div class="es-val">${activeTasks}</div>
         </div>
-        <div class="ec-stat">
-          <div class="es-val" style="color:var(--success)">${completedTasks}</div>
+        <div class="ec-stat-box">
           <div class="es-label">Bajarilgan</div>
+          <div class="es-val">${completedTasks}</div>
         </div>
-        <div class="ec-stat">
-          <div class="es-val">${u.projects}</div>
+        <div class="ec-stat-box">
           <div class="es-label">Loyihalar</div>
+          <div class="es-val">${u.projects}</div>
         </div>
       </div>
     </div>`;

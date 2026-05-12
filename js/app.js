@@ -317,12 +317,12 @@ async function createProject() {
     const payload = {
       name,
       client,
-      pmId: USERS.find(u => u.name === pm)?.id || currentUser.id,
+      pm_id: USERS.find(u => u.name === pm)?.id || currentUser.id,
       status,
       priority,
-      start,
+      start_date: start,
       deadline,
-      desc,
+      description: desc,
       team: selectedIds
     };
 
