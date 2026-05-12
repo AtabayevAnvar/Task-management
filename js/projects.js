@@ -17,7 +17,7 @@ function renderProjects() {
     <div class="filter-bar">
       <div class="filter-search">
         <img src="assets/icons/sidebar-icons/search-icon.svg" alt="search" width="16" height="16" style="opacity:0.5">
-        <input type="search" placeholder="Loyiha qidirish..." id="projSearch" name="search_projects" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="search" value="${projectFilter.search}" oninput="projectFilter.search=this.value;renderProjects()">
+        <input type="search" placeholder="Loyiha qidirish..." id="projSearch" name="search_projects" autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="search" value="${projectFilter.search}" oninput="projectFilter.search=this.value;renderProjects()">
       </div>
       <select class="filter-select" id="filterProjStatus" onchange="projectFilter.status=this.value;renderProjects()">
         <option value="">Barcha statuslar</option>

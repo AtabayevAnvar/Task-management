@@ -7,7 +7,7 @@ function renderHeader() {
     <div class="header-right">
       <div class="header-search">
         <span class="search-icon"><img src="assets/icons/sidebar-icons/search-icon.svg" alt="search" width="18" height="18" style="opacity:0.6"></span>
-        <input type="search" placeholder="Qidirish..." id="globalSearch" name="search_global" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="search">
+        <input type="search" placeholder="Qidirish..." id="globalSearch" name="search_global" autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="search">
       </div>
 
       <!-- Quick Theme Toggle -->
