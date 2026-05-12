@@ -61,6 +61,22 @@ function showLoginPage() {
   if (passInput) passInput.value = '';
 }
 
+// Toggle password visibility
+function togglePassword() {
+  const passwordInput = document.getElementById('loginPassword');
+  const eyeIcon = document.getElementById('passwordEyeIcon');
+  
+  if (passwordInput && eyeIcon) {
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      eyeIcon.src = 'assets/icons/eye-open.svg';
+    } else {
+      passwordInput.type = 'password';
+      eyeIcon.src = 'assets/icons/eye-close.svg';
+    }
+  }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   const loginForm = document.getElementById('loginForm');
   const loginPage = document.getElementById('loginPage');
