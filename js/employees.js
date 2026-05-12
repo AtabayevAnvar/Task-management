@@ -8,11 +8,6 @@ function renderEmployees() {
   const roleFilter = { admin: 'Super Admin', pm: 'Project Manager', teamlead: 'Team Lead', employee: 'Developer', hr: 'HR' };
 
   page.innerHTML = `
-    <div class="page-header">
-      <h2>Xodimlar <span style="font-size:var(--text-md);color:var(--text-tertiary);font-weight:400">(${USERS.length})</span></h2>
-      ${currentRole === 'admin' ? '<button class="btn btn-primary" onclick="openModal(\'modalCreateEmployee\')">+ Xodim qo\'shish</button>' : ''}
-    </div>
-
     <div class="filter-bar">
       <div class="filter-search">
         <img src="assets/icons/sidebar-icons/search-icon.svg" alt="search" width="16" height="16" style="opacity:0.5">
@@ -26,6 +21,7 @@ function renderEmployees() {
         <option value="employee">Employee</option>
         <option value="hr">HR</option>
       </select>
+      ${currentRole === 'admin' ? '<button class="btn btn-primary" onclick="openModal(\'modalCreateEmployee\')">+ Xodim qo\'shish</button>' : ''}
     </div>
 
     <div class="employee-grid" id="employeeGrid">
