@@ -69,10 +69,12 @@ function togglePassword() {
   if (passwordInput && eyeIcon) {
     if (passwordInput.type === 'password') {
       passwordInput.type = 'text';
-      eyeIcon.src = 'assets/icons/eye-open.svg';
+      eyeIcon.style.maskImage = "url('assets/icons/eye-open.svg')";
+      eyeIcon.style.webkitMaskImage = "url('assets/icons/eye-open.svg')";
     } else {
       passwordInput.type = 'password';
-      eyeIcon.src = 'assets/icons/eye-close.svg';
+      eyeIcon.style.maskImage = "url('assets/icons/eye-close.svg')";
+      eyeIcon.style.webkitMaskImage = "url('assets/icons/eye-close.svg')";
     }
   }
 }

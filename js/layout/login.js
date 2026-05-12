@@ -16,8 +16,8 @@ function renderLogin() {
         <label>Parol</label>
         <div class="password-wrapper" style="position: relative; display: flex; align-items: center;">
           <input type="password" id="loginPassword" placeholder="••••••••" required style="padding-right: 40px; width: 100%;">
-          <button type="button" id="togglePasswordVisibility" style="position: absolute; right: 10px; background: transparent; border: none; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; opacity: 0.6; transition: opacity 0.2s;" onclick="togglePassword()">
-            <img src="assets/icons/eye-close.svg" alt="Show Password" id="passwordEyeIcon" width="20" height="20">
+          <button type="button" id="togglePasswordVisibility" style="position: absolute; right: 10px; background: transparent; border: none; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; opacity: 1; transition: opacity 0.2s;" onclick="togglePassword()">
+            <div id="passwordEyeIcon" class="password-toggle-icon" style="-webkit-mask-image: url('assets/icons/eye-close.svg'); mask-image: url('assets/icons/eye-close.svg');"></div>
           </button>
         </div>
       </div>
