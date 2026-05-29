@@ -2,8 +2,9 @@
    SERVER — TaskFlow Backend Entry Point
    ============================================ */
 
-require('dotenv').config();
+require('./loadEnv');
 const express = require('express');
+const { requireEnv } = require('./loadEnv');
 const cors = require('cors');
 const path = require('path');
 const { initDatabase, dbWrapper } = require('./db/database');
@@ -19,6 +20,13 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '..')));
 
 async function startServer() {
+  if (!requireEnv('JWT_SECRET')) {
+    console.warn(
+      '⚠️  JWT_SECRET o\'rnatilmagan — standart kalit ishlatilmoqda. ' +
+      'Production uchun Render Environment ga JWT_SECRET qo\'ying.'
+    );
+  }
+
   // Initialize database
   await initDatabase();
   

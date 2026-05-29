@@ -197,11 +197,19 @@ To‘liq mantiq `backend/routes/` papkasida.
 
 ---
 
+## Render.com da deploy
+
+Batafsil: [RENDER.md](./RENDER.md)
+
+Asosiy qoida: `DATABASE_URL` va `JWT_SECRET` ni Render **Environment** ga qo‘ying (`.env` GitHubga yuklanmaydi).
+
+---
+
 ## Muammolarni bartaraf etish
 
 | Muammo | Yechim |
 |--------|--------|
-| `DATABASE_URL is not defined` | `backend/.env` faylini tekshiring |
+| `DATABASE_URL topilmadi` | Lokal: `backend/.env`. Render: Dashboard → Environment → PostgreSQL URL |
 | `Server bilan aloqa yo'q` | `npm start` ishlayotganini va portni tekshiring |
 | `Token yaroqsiz` | Qayta login qiling yoki `localStorage` ni tozalang |
 | SSL xatosi (Render) | `.env` ga `PGSSLMODE=require` qo‘shing |

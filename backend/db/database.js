@@ -2,15 +2,18 @@
    DATABASE — PostgreSQL connection + schema
    ============================================ */
 
-require('dotenv').config();
 const { Pool } = require('pg');
+const { getDatabaseUrl } = require('../loadEnv');
 
 let pool = null;
 
 async function initDatabase() {
-  const connectionString = process.env.DATABASE_URL;
+  const connectionString = getDatabaseUrl();
   if (!connectionString) {
-    throw new Error('DATABASE_URL is not defined in .env');
+    throw new Error(
+      'DATABASE_URL topilmadi. Render Dashboard → Task-management → Environment → ' +
+      'PostgreSQL "Internal Database URL" ni DATABASE_URL sifatida qo\'shing (yoki bazani web service ga ulang).'
+    );
   }
 
   const forceSsl =
