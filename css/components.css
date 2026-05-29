@@ -451,6 +451,16 @@
   width: 440px;
 }
 
+.modal-confirm .modal-footer {
+  justify-content: stretch;
+  gap: var(--space-3);
+}
+
+.modal-confirm .modal-footer .btn {
+  flex: 1;
+  min-width: 0;
+}
+
 .confirm-modal-body {
   display: flex;
   flex-direction: column;
