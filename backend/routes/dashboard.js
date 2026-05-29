@@ -1,5 +1,5 @@
 /* ============================================
-   DASHBOARD ROUTES — Stats + Activity
+   DASHBOARD ROUTES - Stats + Activity
    ============================================ */
 
 const express = require('express');
@@ -8,79 +8,96 @@ const { authMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
 
-// ── GET /api/dashboard/stats ──
-router.get('/stats', authMiddleware, (req, res) => {
-  const totalProjects = db.prepare('SELECT COUNT(*) as count FROM projects').get().count;
-  const activeProjects = db.prepare("SELECT COUNT(*) as count FROM projects WHERE status = 'progress'").get().count;
-  const totalTasks = db.prepare('SELECT COUNT(*) as count FROM tasks').get().count;
-  const completedTasks = db.prepare("SELECT COUNT(*) as count FROM tasks WHERE status = 'approved'").get().count;
-  const delayedTasks = db.prepare("SELECT COUNT(*) as count FROM tasks WHERE status = 'delayed'").get().count;
-  const reviewTasks = db.prepare("SELECT COUNT(*) as count FROM tasks WHERE status = 'review'").get().count;
-  const totalUsers = db.prepare('SELECT COUNT(*) as count FROM users').get().count;
-  const onlineUsers = db.prepare("SELECT COUNT(*) as count FROM users WHERE status = 'online'").get().count;
+// GET /api/dashboard/stats
+router.get('/stats', authMiddleware, async (req, res, next) => {
+  try {
+    const totalProjects = await db.get('SELECT COUNT(*) as count FROM projects');
+    const activeProjects = await db.get("SELECT COUNT(*) as count FROM projects WHERE status = 'progress'");
+    const totalTasks = await db.get('SELECT COUNT(*) as count FROM tasks');
+    const completedTasks = await db.get("SELECT COUNT(*) as count FROM tasks WHERE status = 'approved'");
+    const delayedTasks = await db.get("SELECT COUNT(*) as count FROM tasks WHERE status = 'delayed'");
+    const reviewTasks = await db.get("SELECT COUNT(*) as count FROM tasks WHERE status = 'review'");
+    const totalUsers = await db.get('SELECT COUNT(*) as count FROM users');
+    const onlineUsers = await db.get("SELECT COUNT(*) as count FROM users WHERE status = 'online'");
 
-  // Task status distribution
-  const statusDistribution = db.prepare(`
-    SELECT status, COUNT(*) as count FROM tasks GROUP BY status
-  `).all();
+    const statusDistribution = await db.all(
+      'SELECT status, COUNT(*) as count FROM tasks GROUP BY status'
+    );
 
-  // Projects with progress (for chart)
-  const projectProgress = db.prepare(`
-    SELECT id, name, progress, status FROM projects ORDER BY id LIMIT 6
-  `).all();
+    const projectProgress = await db.all(
+      'SELECT id, name, progress, status FROM projects ORDER BY id LIMIT 6'
+    );
 
-  // Upcoming deadlines
-  const upcomingDeadlines = db.prepare(`
-    SELECT t.*, p.name as project_name 
-    FROM tasks t LEFT JOIN projects p ON t.project_id = p.id
-    WHERE t.deadline != '' AND t.status NOT IN ('approved','cancelled')
-    ORDER BY t.deadline ASC LIMIT 5
-  `).all();
+    const upcomingDeadlines = await db.all(
+      `SELECT t.*, p.name as project_name
+       FROM tasks t
+       LEFT JOIN projects p ON t.project_id = p.id
+       WHERE t.deadline != '' AND t.status NOT IN ('approved', 'cancelled')
+       ORDER BY t.deadline ASC
+       LIMIT 5`
+    );
 
-  // Employee workload
-  const workload = db.prepare(`
-    SELECT u.id, u.name, u.initials, u.color, u.position,
-      (SELECT COUNT(*) FROM tasks WHERE assignee_id = u.id AND status NOT IN ('approved','cancelled')) as activeTasks
-    FROM users u
-    WHERE u.role = 'employee'
-    ORDER BY activeTasks DESC
-  `).all();
+    const workload = await db.all(
+      `SELECT u.id, u.name, u.initials, u.color, u.position,
+              (SELECT COUNT(*) FROM tasks WHERE assignee_id = u.id AND status NOT IN ('approved','cancelled')) as "activeTasks"
+       FROM users u
+       WHERE u.role = 'employee'
+       ORDER BY "activeTasks" DESC`
+    );
 
-  res.json({
-    totalProjects,
-    activeProjects,
-    totalTasks,
-    completedTasks,
-    delayedTasks,
-    reviewTasks,
-    totalUsers,
-    onlineUsers,
-    statusDistribution,
-    projectProgress,
-    upcomingDeadlines,
-    workload,
-  });
+    res.json({
+      totalProjects: Number(totalProjects.count),
+      activeProjects: Number(activeProjects.count),
+      totalTasks: Number(totalTasks.count),
+      completedTasks: Number(completedTasks.count),
+      delayedTasks: Number(delayedTasks.count),
+      reviewTasks: Number(reviewTasks.count),
+      totalUsers: Number(totalUsers.count),
+      onlineUsers: Number(onlineUsers.count),
+      statusDistribution: statusDistribution.map((item) => ({ ...item, count: Number(item.count) })),
+      projectProgress,
+      upcomingDeadlines,
+      workload: workload.map((item) => ({ ...item, activeTasks: Number(item.activeTasks) }))
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
-// ── GET /api/dashboard/activity ──
-router.get('/activity', authMiddleware, (req, res) => {
-  const activities = db.prepare(`
-    SELECT a.*, u.name, u.initials, u.color
-    FROM activity_log a JOIN users u ON a.user_id = u.id
-    ORDER BY a.id DESC LIMIT 10
-  `).all();
+// GET /api/dashboard/activity
+router.get('/activity', authMiddleware, async (req, res, next) => {
+  try {
+    const activities = await db.all(
+      `SELECT a.*, u.name, u.initials, u.color
+       FROM activity_log a
+       JOIN users u ON a.user_id = u.id
+       ORDER BY a.id DESC
+       LIMIT 10`
+    );
 
-  res.json(activities.map(a => ({
-    ...a,
-    time: getRelativeTime(a.created_at),
-    userId: a.user_id,
-  })));
+    res.json(
+      activities.map((activity) => ({
+        ...activity,
+        time: getRelativeTime(activity.created_at),
+        userId: activity.user_id
+      }))
+    );
+  } catch (err) {
+    next(err);
+  }
 });
 
-function getRelativeTime(dateStr) {
-  if (!dateStr) return '';
+function getRelativeTime(value) {
+  if (!value) {
+    return '';
+  }
+
   const now = new Date();
-  const date = new Date(dateStr);
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return '';
+  }
+
   const diffMs = now - date;
   const diffMin = Math.floor(diffMs / 60000);
   const diffHr = Math.floor(diffMs / 3600000);
@@ -90,7 +107,7 @@ function getRelativeTime(dateStr) {
   if (diffMin < 60) return `${diffMin} daqiqa oldin`;
   if (diffHr < 24) return `${diffHr} soat oldin`;
   if (diffDay < 7) return diffDay === 1 ? 'kecha' : `${diffDay} kun oldin`;
-  return dateStr.split(' ')[0] || dateStr;
+  return date.toISOString().slice(0, 10);
 }
 
 module.exports = router;

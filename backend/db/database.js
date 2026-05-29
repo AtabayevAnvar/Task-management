@@ -1,33 +1,36 @@
 /* ============================================
-   DATABASE — SQLite (sql.js) connection + schema
+   DATABASE — PostgreSQL connection + schema
    ============================================ */
 
-const initSqlJs = require('sql.js');
-const fs = require('fs');
-const path = require('path');
+require('dotenv').config();
+const { Pool } = require('pg');
 
-const dbPath = path.join(__dirname, 'taskflow.db');
-
-let db = null;
+let pool = null;
 
 async function initDatabase() {
-  const SQL = await initSqlJs();
-
-  // Load existing DB or create new
-  if (fs.existsSync(dbPath)) {
-    const buffer = fs.readFileSync(dbPath);
-    db = new SQL.Database(buffer);
-  } else {
-    db = new SQL.Database();
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error('DATABASE_URL is not defined in .env');
   }
 
-  // Enable foreign keys
-  db.run('PRAGMA foreign_keys = ON');
+  const forceSsl =
+    process.env.PGSSLMODE === 'require' ||
+    process.env.DB_SSL === 'true' ||
+    /render\.com/i.test(connectionString);
 
-  // ── Create Tables ──
-  db.run(`
+  const poolConfig = { connectionString };
+  if (forceSsl) {
+    poolConfig.ssl = { rejectUnauthorized: false };
+  }
+
+  pool = new Pool(poolConfig);
+
+  // ── Create Tables (PostgreSQL syntax) ──
+  // Note: INTEGER PRIMARY KEY AUTOINCREMENT becomes SERIAL PRIMARY KEY
+  // Note: DATETIME becomes TIMESTAMP
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       name TEXT NOT NULL,
       email TEXT UNIQUE NOT NULL,
       password TEXT NOT NULL,
@@ -36,13 +39,13 @@ async function initDatabase() {
       color TEXT,
       position TEXT,
       status TEXT DEFAULT 'offline' CHECK(status IN ('online','offline','busy')),
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
-  db.run(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS projects (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       name TEXT NOT NULL,
       client TEXT,
       pm_id INTEGER REFERENCES users(id),
@@ -52,11 +55,11 @@ async function initDatabase() {
       start_date TEXT,
       deadline TEXT,
       description TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
-  db.run(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS project_members (
       project_id INTEGER REFERENCES projects(id) ON DELETE CASCADE,
       user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
@@ -64,9 +67,9 @@ async function initDatabase() {
     )
   `);
 
-  db.run(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS tasks (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       code TEXT UNIQUE,
       title TEXT NOT NULL,
       project_id INTEGER REFERENCES projects(id) ON DELETE CASCADE,
@@ -79,30 +82,30 @@ async function initDatabase() {
       delay_days INTEGER DEFAULT 0,
       comments_count INTEGER DEFAULT 0,
       files_count INTEGER DEFAULT 0,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
-  db.run(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS checklists (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       task_id INTEGER REFERENCES tasks(id) ON DELETE CASCADE,
       text TEXT NOT NULL,
       done INTEGER DEFAULT 0
     )
   `);
 
-  db.run(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS chat_rooms (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       type TEXT DEFAULT 'group' CHECK(type IN ('group','direct')),
       name TEXT,
       color TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
-  db.run(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS chat_members (
       room_id INTEGER REFERENCES chat_rooms(id) ON DELETE CASCADE,
       user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
@@ -110,19 +113,19 @@ async function initDatabase() {
     )
   `);
 
-  db.run(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS messages (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       room_id INTEGER REFERENCES chat_rooms(id) ON DELETE CASCADE,
       user_id INTEGER REFERENCES users(id),
       text TEXT NOT NULL,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
-  db.run(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS notifications (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
       type TEXT,
       icon TEXT,
@@ -130,13 +133,13 @@ async function initDatabase() {
       description TEXT,
       read INTEGER DEFAULT 0,
       color TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
-  db.run(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS feedbacks (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       type TEXT CHECK(type IN ('idea','suggestion','complaint')),
       subject TEXT NOT NULL,
       text TEXT NOT NULL,
@@ -146,107 +149,140 @@ async function initDatabase() {
       response_text TEXT,
       response_author TEXT,
       response_date TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
-  db.run(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS project_files (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       project_id INTEGER REFERENCES projects(id) ON DELETE CASCADE,
       name TEXT NOT NULL,
       size TEXT,
       author TEXT,
-      uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
-  db.run(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS activity_log (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       user_id INTEGER REFERENCES users(id),
       action TEXT NOT NULL,
       target TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
-  saveDatabase();
-  return db;
+  return pool;
 }
 
-// Save database to file
-function saveDatabase() {
-  if (db) {
-    const data = db.export();
-    const buffer = Buffer.from(data);
-    fs.writeFileSync(dbPath, buffer);
+function ensurePool() {
+  if (!pool) {
+    throw new Error('Database is not initialized. Call initDatabase() before queries.');
   }
 }
 
-// ── Wrapper methods (better-sqlite3 compatible API) ──
+// Convert SQLite '?' binding to PostgreSQL '$1, $2'
+function convertSql(sql) {
+  let count = 1;
+  return sql.replace(/\?/g, () => `$${count++}`);
+}
+
+// ── Wrapper methods (Async interface for Postgres) ──
 const dbWrapper = {
-  prepare(sql) {
-    return {
-      run(...params) {
-        db.run(sql, params);
-        // Return lastInsertRowid BEFORE saveDatabase() which might interfere
-        const res = db.exec('SELECT last_insert_rowid() as id');
-        let insertedId = 0;
-        if (res && res.length > 0 && res[0].values && res[0].values.length > 0) {
-          insertedId = res[0].values[0][0];
-        }
-        saveDatabase();
-        return { lastInsertRowid: insertedId };
-      },
-      get(...params) {
-        const stmt = db.prepare(sql);
-        stmt.bind(params);
-        if (stmt.step()) {
-          const cols = stmt.getColumnNames();
-          const vals = stmt.get();
-          stmt.free();
-          const obj = {};
-          cols.forEach((c, i) => obj[c] = vals[i]);
-          return obj;
-        }
-        stmt.free();
-        return undefined;
-      },
-      all(...params) {
-        const results = [];
-        const stmt = db.prepare(sql);
-        stmt.bind(params);
-        while (stmt.step()) {
-          const cols = stmt.getColumnNames();
-          const vals = stmt.get();
-          const obj = {};
-          cols.forEach((c, i) => obj[c] = vals[i]);
-          results.push(obj);
-        }
-        stmt.free();
-        return results;
-      }
-    };
+  // Returns a single object
+  async get(sql, ...params) {
+    ensurePool();
+    const pgSql = convertSql(sql);
+    const result = await pool.query(pgSql, params);
+    return result.rows[0];
   },
-  exec(sql) {
-    db.run(sql);
-    saveDatabase();
+  // Returns array of objects
+  async all(sql, ...params) {
+    ensurePool();
+    const pgSql = convertSql(sql);
+    const result = await pool.query(pgSql, params);
+    return result.rows;
   },
-  transaction(fn) {
-    return (...args) => {
-      db.run('BEGIN TRANSACTION');
+  // Returns { lastInsertRowid }
+  async run(sql, ...params) {
+    ensurePool();
+
+    const pgSql = convertSql(sql);
+    const normalizedSql = pgSql.replace(/;\s*$/, '');
+    const isInsert = /^\s*INSERT\b/i.test(normalizedSql);
+    const hasReturning = /\bRETURNING\b/i.test(normalizedSql);
+
+    let result;
+    if (isInsert && !hasReturning) {
       try {
-        fn(...args);
-        db.run('COMMIT');
-        saveDatabase();
-      } catch (e) {
-        console.error('TRANSACTION ERROR:', e.message);
-        try { db.run('ROLLBACK'); } catch(re) {}
-        throw e;
+        result = await pool.query(`${normalizedSql} RETURNING id`, params);
+      } catch (err) {
+        // Some tables use composite primary keys and do not have "id".
+        if (err && err.code === '42703' && /column\s+["']?id["']?\s+does not exist/i.test(err.message || '')) {
+          result = await pool.query(normalizedSql, params);
+        } else {
+          throw err;
+        }
       }
-    };
+    } else {
+      result = await pool.query(normalizedSql, params);
+    }
+
+    let lastInsertRowid = 0;
+    if (result.rows && result.rows.length > 0) {
+      if (result.rows[0].id !== undefined) {
+        lastInsertRowid = result.rows[0].id;
+      }
+    }
+    return { lastInsertRowid };
+  },
+  async exec(sql) {
+    ensurePool();
+    await pool.query(sql);
+  },
+  async transaction(fn) {
+    ensurePool();
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      const txDb = {
+        async get(sql, ...params) {
+          const result = await client.query(convertSql(sql), params);
+          return result.rows[0];
+        },
+        async all(sql, ...params) {
+          const result = await client.query(convertSql(sql), params);
+          return result.rows;
+        },
+        async run(sql, ...params) {
+          const txSql = convertSql(sql).replace(/;\s*$/, '');
+          const txResult = await client.query(txSql, params);
+          let lastInsertRowid = 0;
+          if (txResult.rows && txResult.rows.length > 0 && txResult.rows[0].id !== undefined) {
+            lastInsertRowid = txResult.rows[0].id;
+          }
+          return { lastInsertRowid };
+        },
+        async exec(sql) {
+          await client.query(sql);
+        }
+      };
+
+      await fn(txDb);
+      await client.query('COMMIT');
+    } catch (e) {
+      await client.query('ROLLBACK');
+      throw e;
+    } finally {
+      client.release();
+    }
   }
 };
 
-module.exports = { initDatabase, dbWrapper, saveDatabase };
+function getPool() {
+  return pool;
+}
+
+module.exports = { initDatabase, dbWrapper, getPool };

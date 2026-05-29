@@ -3,7 +3,7 @@
    ============================================ */
 
 const bcrypt = require('bcryptjs');
-const { initDatabase, dbWrapper, saveDatabase } = require('./database');
+const { initDatabase, dbWrapper } = require('./database');
 
 async function seed() {
   console.log('🌱 Seeding database...');
@@ -12,8 +12,8 @@ async function seed() {
   const db = dbWrapper;
 
   // ── Check if already seeded ──
-  const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get();
-  if (userCount && userCount.count > 0) {
+  const userCount = await db.get('SELECT COUNT(*) as count FROM users');
+  if (userCount && parseInt(userCount.count, 10) > 0) {
     console.log('⚠️  Database already has data. Skipping seed.');
     process.exit(0);
   }
@@ -37,7 +37,7 @@ async function seed() {
   ];
 
   for (const u of users) {
-    db.prepare('INSERT INTO users (name, email, password, role, initials, color, position, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').run(...u);
+    await db.run('INSERT INTO users (name, email, password, role, initials, color, position, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', ...u);
   }
   console.log(`✅ ${users.length} users created`);
 
@@ -56,7 +56,7 @@ async function seed() {
   ];
 
   for (const p of projects) {
-    db.prepare('INSERT INTO projects (name, client, pm_id, status, priority, progress, start_date, deadline, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)').run(...p);
+    await db.run('INSERT INTO projects (name, client, pm_id, status, priority, progress, start_date, deadline, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', ...p);
   }
   console.log(`✅ ${projects.length} projects created`);
 
@@ -72,7 +72,7 @@ async function seed() {
     [8, 10],
   ];
   for (const m of members) {
-    db.prepare('INSERT INTO project_members (project_id, user_id) VALUES (?, ?)').run(...m);
+    await db.run('INSERT INTO project_members (project_id, user_id) VALUES (?, ?) RETURNING project_id', ...m);
   }
   console.log(`✅ ${members.length} project members added`);
 
@@ -84,7 +84,7 @@ async function seed() {
     [4, 'HR_Requirements.xlsx',   '560 KB', 'Zilola M.'],
   ];
   for (const f of files) {
-    db.prepare('INSERT INTO project_files (project_id, name, size, author) VALUES (?, ?, ?, ?)').run(...f);
+    await db.run('INSERT INTO project_files (project_id, name, size, author) VALUES (?, ?, ?, ?)', ...f);
   }
 
   // ══════════════════════════════════════
@@ -112,7 +112,7 @@ async function seed() {
   ];
 
   for (const t of tasks) {
-    db.prepare('INSERT INTO tasks (code, title, project_id, assignee_id, status, priority, deadline, description, delay_reason, delay_days, comments_count, files_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').run(...t);
+    await db.run('INSERT INTO tasks (code, title, project_id, assignee_id, status, priority, deadline, description, delay_reason, delay_days, comments_count, files_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ...t);
   }
   console.log(`✅ ${tasks.length} tasks created`);
 
@@ -138,7 +138,7 @@ async function seed() {
     [18, 'SMTP setup', 0], [18, 'Templates', 0],
   ];
   for (const c of checklists) {
-    db.prepare('INSERT INTO checklists (task_id, text, done) VALUES (?, ?, ?)').run(...c);
+    await db.run('INSERT INTO checklists (task_id, text, done) VALUES (?, ?, ?)', ...c);
   }
   console.log(`✅ ${checklists.length} checklist items created`);
 
@@ -155,7 +155,7 @@ async function seed() {
     ['direct', null,              null],
   ];
   for (const r of rooms) {
-    db.prepare('INSERT INTO chat_rooms (type, name, color) VALUES (?, ?, ?)').run(...r);
+    await db.run('INSERT INTO chat_rooms (type, name, color) VALUES (?, ?, ?)', ...r);
   }
 
   const chatMembers = [
@@ -168,7 +168,7 @@ async function seed() {
     [7, 1], [7, 2],
   ];
   for (const m of chatMembers) {
-    db.prepare('INSERT INTO chat_members (room_id, user_id) VALUES (?, ?)').run(...m);
+    await db.run('INSERT INTO chat_members (room_id, user_id) VALUES (?, ?) RETURNING room_id', ...m);
   }
 
   const today = new Date().toISOString().split('T')[0];
@@ -184,7 +184,7 @@ async function seed() {
     [4, 4, 'PR merge qildim',                                 `${today} 14:30`],
   ];
   for (const m of msgs) {
-    db.prepare('INSERT INTO messages (room_id, user_id, text, created_at) VALUES (?, ?, ?, ?)').run(...m);
+    await db.run('INSERT INTO messages (room_id, user_id, text, created_at) VALUES (?, ?, ?, ?)', ...m);
   }
   console.log('✅ Chat rooms & messages created');
 
@@ -201,7 +201,7 @@ async function seed() {
     [1, 'feedback', '💡', 'Feedback javob',             'Adminga yuborilgan fikringizga javob keldi',        1, 'var(--accent-500)'],
   ];
   for (const n of notifs) {
-    db.prepare('INSERT INTO notifications (user_id, type, icon, title, description, read, color) VALUES (?, ?, ?, ?, ?, ?, ?)').run(...n);
+    await db.run('INSERT INTO notifications (user_id, type, icon, title, description, read, color) VALUES (?, ?, ?, ?, ?, ?, ?)', ...n);
   }
   console.log('✅ Notifications created');
 
@@ -217,7 +217,7 @@ async function seed() {
     ['complaint',  'VPN sekin ishlaydi',      "Remote ishlaganda VPN juda sekin.", 6, 0, 'resolved', "IT jamoasi bilan hal qilindi.", 'Kamol N.', '2026-03-17'],
   ];
   for (const f of feedbacks) {
-    db.prepare('INSERT INTO feedbacks (type, subject, text, author_id, anonymous, status, response_text, response_author, response_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)').run(...f);
+    await db.run('INSERT INTO feedbacks (type, subject, text, author_id, anonymous, status, response_text, response_author, response_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', ...f);
   }
   console.log('✅ Feedbacks created');
 
@@ -237,11 +237,9 @@ async function seed() {
     [9,  "xodim qo'shdi",         '"Ozoda Tursunova — Junior Dev"'],
   ];
   for (const a of activities) {
-    db.prepare('INSERT INTO activity_log (user_id, action, target) VALUES (?, ?, ?)').run(...a);
+    await db.run('INSERT INTO activity_log (user_id, action, target) VALUES (?, ?, ?)', ...a);
   }
   console.log('✅ Activity log created');
-
-  saveDatabase();
 
   console.log('\n🎉 Database seeded successfully!');
   console.log('\n📋 Login credentials:');
