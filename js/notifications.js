@@ -9,12 +9,12 @@ function renderNotificationsPage() {
   page.innerHTML = `
     
 
-    <div style="display:flex;gap:var(--space-3);margin-bottom:var(--space-5);flex-wrap:wrap">
-      <button class="btn btn-secondary btn-sm notif-filter active-filter" data-filter="all" onclick="filterNotifications('all',this)">Barchasi</button>
-      <button class="btn btn-ghost btn-sm notif-filter" data-filter="task" onclick="filterNotifications('task',this)">Tasklar</button>
-      <button class="btn btn-ghost btn-sm notif-filter" data-filter="deadline" onclick="filterNotifications('deadline',this)">Deadline</button>
-      <button class="btn btn-ghost btn-sm notif-filter" data-filter="review" onclick="filterNotifications('review',this)">Review</button>
-      <button class="btn btn-ghost btn-sm notif-filter" data-filter="chat" onclick="filterNotifications('chat',this)">Chat</button>
+    <div class="tabs tabs-wrap">
+      <button class="tab-btn notif-filter active active-filter" data-filter="all" onclick="filterNotifications('all',this)">Barchasi</button>
+      <button class="tab-btn notif-filter" data-filter="task" onclick="filterNotifications('task',this)">Tasklar</button>
+      <button class="tab-btn notif-filter" data-filter="deadline" onclick="filterNotifications('deadline',this)">Deadline</button>
+      <button class="tab-btn notif-filter" data-filter="review" onclick="filterNotifications('review',this)">Review</button>
+      <button class="tab-btn notif-filter" data-filter="chat" onclick="filterNotifications('chat',this)">Chat</button>
     </div>
 
     <div class="notifications-list" id="notifPageList">
@@ -38,13 +38,11 @@ function renderNotifCards(items) {
 
 function filterNotifications(type, btn) {
   document.querySelectorAll('.notif-filter').forEach(b => {
+    b.classList.remove('active');
     b.classList.remove('active-filter');
-    b.classList.remove('btn-secondary');
-    b.classList.add('btn-ghost');
   });
+  btn.classList.add('active');
   btn.classList.add('active-filter');
-  btn.classList.add('btn-secondary');
-  btn.classList.remove('btn-ghost');
 
   const filtered = type === 'all' ? NOTIFICATIONS : NOTIFICATIONS.filter(n => n.type === type);
   document.getElementById('notifPageList').innerHTML = renderNotifCards(filtered);

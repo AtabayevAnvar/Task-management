@@ -13,10 +13,10 @@ function renderTasks() {
       <h2>Tasklar</h2>
       <div style="display:flex;gap:var(--space-3);align-items:center">
         <div class="view-switcher">
-          <button class="view-btn ${taskView==='kanban'?'active':''}" onclick="taskView='kanban';renderTasks()">▦ Kanban</button>
-          <button class="view-btn ${taskView==='table'?'active':''}" onclick="taskView='table';renderTasks()">☰ Table</button>
-          <button class="view-btn ${taskView==='calendar'?'active':''}" onclick="taskView='calendar';renderTasks()">📅 Calendar</button>
-          <button class="view-btn ${taskView==='workload'?'active':''}" onclick="taskView='workload';renderTasks()">👥 Workload</button>
+          <button class="tab-btn view-btn ${taskView==='kanban'?'active':''}" onclick="taskView='kanban';renderTasks()">▦ Kanban</button>
+          <button class="tab-btn view-btn ${taskView==='table'?'active':''}" onclick="taskView='table';renderTasks()">☰ Table</button>
+          <button class="tab-btn view-btn ${taskView==='calendar'?'active':''}" onclick="taskView='calendar';renderTasks()">📅 Calendar</button>
+          <button class="tab-btn view-btn ${taskView==='workload'?'active':''}" onclick="taskView='workload';renderTasks()">👥 Workload</button>
         </div>
         ${currentRole === 'admin' || currentRole === 'pm' ? `<button class="btn btn-primary" onclick="openModal('modalCreateTask')">+ Yangi task</button>` : ''}
       </div>

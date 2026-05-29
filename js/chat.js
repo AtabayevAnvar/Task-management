@@ -19,9 +19,9 @@ function renderChat() {
           </div>
         </div>
         <div class="chat-tabs">
-          <button class="chat-tab active" id="chatTabAll">Barchasi</button>
-          <button class="chat-tab" id="chatTabGroup">Guruhlar</button>
-          <button class="chat-tab" id="chatTabDirect">Shaxsiy</button>
+          <button class="tab-btn chat-tab active" id="chatTabAll">Barchasi</button>
+          <button class="tab-btn chat-tab" id="chatTabGroup">Guruhlar</button>
+          <button class="tab-btn chat-tab" id="chatTabDirect">Shaxsiy</button>
         </div>
         <div class="chat-list" id="chatList"></div>
       </div>

@@ -11,12 +11,12 @@ function renderSettings() {
     
 
     <div class="settings-tabs">
-      <div class="settings-tab ${settingsTab === 'profile' ? 'active' : ''}" onclick="settingsTab='profile';renderSettings()">Profil</div>
-      <div class="settings-tab ${settingsTab === 'notifications' ? 'active' : ''}" onclick="settingsTab='notifications';renderSettings()">Bildirishnomalar</div>
-      <div class="settings-tab ${settingsTab === 'security' ? 'active' : ''}" onclick="settingsTab='security';renderSettings()">Xavfsizlik</div>
+      <div class="tab-btn settings-tab ${settingsTab === 'profile' ? 'active' : ''}" onclick="settingsTab='profile';renderSettings()">Profil</div>
+      <div class="tab-btn settings-tab ${settingsTab === 'notifications' ? 'active' : ''}" onclick="settingsTab='notifications';renderSettings()">Bildirishnomalar</div>
+      <div class="tab-btn settings-tab ${settingsTab === 'security' ? 'active' : ''}" onclick="settingsTab='security';renderSettings()">Xavfsizlik</div>
       ${currentRole === 'admin' ? `
-        <div class="settings-tab ${settingsTab === 'roles' ? 'active' : ''}" onclick="settingsTab='roles';renderSettings()">Rollar va ruxsatlar</div>
-        <div class="settings-tab ${settingsTab === 'system' ? 'active' : ''}" onclick="settingsTab='system';renderSettings()">Tizim</div>
+        <div class="tab-btn settings-tab ${settingsTab === 'roles' ? 'active' : ''}" onclick="settingsTab='roles';renderSettings()">Rollar va ruxsatlar</div>
+        <div class="tab-btn settings-tab ${settingsTab === 'system' ? 'active' : ''}" onclick="settingsTab='system';renderSettings()">Tizim</div>
       ` : ''}
     </div>
 

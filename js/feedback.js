@@ -23,11 +23,11 @@ function renderFeedback() {
       <button class="btn btn-primary" onclick="openModal('modalFeedback')">+ Yangi fikr</button>
     </div>
 
-    <div style="display:flex;gap:var(--space-3);margin-bottom:var(--space-5);flex-wrap:wrap">
-      <button class="btn ${feedbackFilter==='all'?'btn-secondary':'btn-ghost'} btn-sm" onclick="feedbackFilter='all';renderFeedback()">Barchasi (${counts.all})</button>
-      <button class="btn ${feedbackFilter==='idea'?'btn-secondary':'btn-ghost'} btn-sm" onclick="feedbackFilter='idea';renderFeedback()">💡 Fikrlar (${counts.idea})</button>
-      <button class="btn ${feedbackFilter==='suggestion'?'btn-secondary':'btn-ghost'} btn-sm" onclick="feedbackFilter='suggestion';renderFeedback()">📝 Takliflar (${counts.suggestion})</button>
-      <button class="btn ${feedbackFilter==='complaint'?'btn-secondary':'btn-ghost'} btn-sm" onclick="feedbackFilter='complaint';renderFeedback()">⚠️ Shikoyatlar (${counts.complaint})</button>
+    <div class="tabs tabs-wrap">
+      <button class="tab-btn feedback-tab ${feedbackFilter==='all'?'active':''}" onclick="feedbackFilter='all';renderFeedback()">Barchasi (${counts.all})</button>
+      <button class="tab-btn feedback-tab ${feedbackFilter==='idea'?'active':''}" onclick="feedbackFilter='idea';renderFeedback()">💡 Fikrlar (${counts.idea})</button>
+      <button class="tab-btn feedback-tab ${feedbackFilter==='suggestion'?'active':''}" onclick="feedbackFilter='suggestion';renderFeedback()">📝 Takliflar (${counts.suggestion})</button>
+      <button class="tab-btn feedback-tab ${feedbackFilter==='complaint'?'active':''}" onclick="feedbackFilter='complaint';renderFeedback()">⚠️ Shikoyatlar (${counts.complaint})</button>
     </div>
 
     <div class="feedback-grid">
