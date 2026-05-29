@@ -749,16 +749,17 @@
   border-radius: var(--radius-lg);
   padding: var(--space-3);
   cursor: grab;
-  /* Keep drag behavior; disable hover animation on the card itself */
-  transition: opacity 0.2s ease;
+  /* Hover animation is disabled intentionally */
+  transition: none !important;
   position: relative;
   z-index: 1;
 }
 
 .kanban-card:hover {
-  border-color: var(--surface-border);
-  box-shadow: none;
-  transform: none;
+  border-color: var(--surface-border) !important;
+  box-shadow: none !important;
+  transform: none !important;
+  filter: none !important;
   z-index: 1;
 }
 
