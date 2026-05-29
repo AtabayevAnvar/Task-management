@@ -152,30 +152,22 @@ function initKanbanDragDrop() {
     card.addEventListener('dragstart', (e) => {
       draggedTaskId = parseInt(card.dataset.taskId);
       isDragging = true;
-      card.style.opacity = '0.4';
-      card.style.transform = 'rotate(2deg)';
       e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('text/plain', card.dataset.taskId);
       
-      // Highlight all drop zones
+      // Use setTimeout so the dragged image retains original styles, but the placeholder card gets the dragging style
       setTimeout(() => {
+        card.classList.add('is-dragging');
         dropZones.forEach(zone => {
-          zone.style.outline = '2px dashed var(--surface-border-light)';
-          zone.style.outlineOffset = '-2px';
-          zone.style.minHeight = '80px';
+          zone.classList.add('drag-active');
         });
       }, 0);
     });
 
     card.addEventListener('dragend', (e) => {
-      card.style.opacity = '1';
-      card.style.transform = '';
-      // Remove highlights
+      card.classList.remove('is-dragging');
       dropZones.forEach(zone => {
-        zone.style.outline = '';
-        zone.style.outlineOffset = '';
-        zone.style.background = '';
-        zone.style.minHeight = '';
+        zone.classList.remove('drag-active', 'drag-over');
       });
       // Reset dragging flag after a short delay so click handler can check it
       setTimeout(() => { isDragging = false; }, 100);
@@ -186,22 +178,19 @@ function initKanbanDragDrop() {
     zone.addEventListener('dragover', (e) => {
       e.preventDefault();
       e.dataTransfer.dropEffect = 'move';
-      zone.style.background = 'rgba(59, 130, 246, 0.08)';
-      zone.style.outline = '2px dashed var(--primary-500)';
+      zone.classList.add('drag-over');
     });
 
     zone.addEventListener('dragleave', (e) => {
       // Only remove highlight if we actually left the zone
       if (!zone.contains(e.relatedTarget)) {
-        zone.style.background = '';
-        zone.style.outline = '2px dashed var(--surface-border-light)';
+        zone.classList.remove('drag-over');
       }
     });
 
     zone.addEventListener('drop', async (e) => {
       e.preventDefault();
-      zone.style.background = '';
-      zone.style.outline = '';
+      zone.classList.remove('drag-active', 'drag-over');
 
       const taskId = parseInt(e.dataTransfer.getData('text/plain'));
       const newStatus = zone.dataset.status;
