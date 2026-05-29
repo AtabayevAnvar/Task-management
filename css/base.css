@@ -347,38 +347,6 @@ button {
   gap: var(--space-3);
 }
 
-.header-search {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  background: var(--input-bg);
-  border: 1px solid var(--surface-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-2) var(--space-3);
-  width: 240px;
-  transition: all var(--transition-fast);
-}
-
-.header-search:focus-within {
-  border-color: var(--primary-500);
-  box-shadow: var(--shadow-glow);
-}
-
-.header-search input {
-  flex: 1;
-  font-size: var(--text-sm);
-  color: var(--text-primary);
-}
-
-.header-search input::placeholder {
-  color: var(--text-tertiary);
-}
-
-.header-search .search-icon {
-  color: var(--text-tertiary);
-  font-size: var(--text-md);
-}
-
 /* Theme toggle icon — dark SVGs need inversion in dark mode */
 .theme-toggle-icon {
   filter: invert(0.85);
@@ -727,16 +695,9 @@ html[data-theme="light"] .theme-toggle-icon {
     display: block;
   }
 
-  .header-search {
-    width: 180px;
-  }
 }
 
 @media (max-width: 768px) {
-  .header-search {
-    display: none;
-  }
-
   .content {
     padding: var(--space-4);
   }

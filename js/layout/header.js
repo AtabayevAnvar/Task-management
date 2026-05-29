@@ -5,11 +5,6 @@ function renderHeader() {
       <h1 class="page-title" id="pageTitle">Dashboard</h1>
     </div>
     <div class="header-right">
-      <div class="header-search">
-        <span class="search-icon"><img src="assets/icons/sidebar-icons/search-icon.svg" alt="search" width="18" height="18" style="opacity:0.6"></span>
-        <input type="search" placeholder="Qidirish..." id="globalSearch" name="search_global" autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="search">
-      </div>
-
       <!-- Quick Theme Toggle -->
       <button class="header-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Mavzuni o'zgartirish">
         <img class="theme-toggle-icon" src="assets/icons/sidebar-icons/${getSavedTheme() === 'dark' ? 'sun' : 'moon'}-icon.svg" alt="theme" width="20" height="20">
