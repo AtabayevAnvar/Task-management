@@ -3,10 +3,14 @@
    ============================================ */
 
 const jwt = require('jsonwebtoken');
+const { dbWrapper: db } = require('../db/database');
+const { touchUserSession } = require('../utils/sessionHelpers');
 
-function authMiddleware(req, res, next) {
+const JWT_SECRET = () => process.env.JWT_SECRET || 'super_secret_key_123_taskflow';
+
+async function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization;
-  
+
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Token topilmadi. Login qiling.' });
   }
@@ -14,15 +18,29 @@ function authMiddleware(req, res, next) {
   const token = authHeader.split(' ')[1];
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'super_secret_key_123_taskflow');
-    req.user = decoded; // { id, role, email }
+    const decoded = jwt.verify(token, JWT_SECRET());
+    req.user = decoded;
+
+    if (decoded.sid) {
+      const session = await db.get(
+        'SELECT id FROM user_sessions WHERE id = ? AND user_id = ? AND revoked_at IS NULL',
+        decoded.sid,
+        decoded.id
+      );
+
+      if (!session) {
+        return res.status(401).json({ error: 'Sessiya tugatilgan. Qayta kiring.' });
+      }
+
+      await touchUserSession(db, decoded.sid, decoded.id);
+    }
+
     next();
   } catch (err) {
     return res.status(401).json({ error: 'Token yaroqsiz yoki muddati tugagan.' });
   }
 }
 
-// Role-based access check
 function requireRole(...roles) {
   return (req, res, next) => {
     if (!req.user) {
@@ -35,4 +53,4 @@ function requireRole(...roles) {
   };
 }
 
-module.exports = { authMiddleware, requireRole };
+module.exports = { authMiddleware, requireRole, JWT_SECRET };

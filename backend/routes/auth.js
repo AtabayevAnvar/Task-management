@@ -6,7 +6,14 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { dbWrapper: db } = require('../db/database');
-const { authMiddleware, requireRole } = require('../middleware/auth');
+const { authMiddleware, requireRole, JWT_SECRET } = require('../middleware/auth');
+const {
+  createUserSession,
+  revokeUserSession,
+  formatSessionTime,
+  parseUserAgent,
+  getClientIp,
+} = require('../utils/sessionHelpers');
 
 const router = express.Router();
 
@@ -30,18 +37,19 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Email yoki parol noto\'g\'ri.' });
     }
 
-    // Update status to online
     await db.run('UPDATE users SET status = ? WHERE id = ?', 'online', user.id);
 
-    // Generate JWT
+    const sessionId = await createUserSession(db, user.id, req);
+
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
-      process.env.JWT_SECRET || 'super_secret_key_123_taskflow',
+      { id: user.id, email: user.email, role: user.role, sid: sessionId },
+      JWT_SECRET(),
       { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
     );
 
     res.json({
       token,
+      sessionId,
       user: {
         id: user.id,
         name: user.name,
@@ -119,8 +127,76 @@ router.get('/me', authMiddleware, async (req, res) => {
 // ── POST /api/auth/logout ──
 router.post('/logout', authMiddleware, async (req, res) => {
   try {
+    if (req.user.sid) {
+      await revokeUserSession(db, req.user.sid, req.user.id);
+    }
     await db.run('UPDATE users SET status = ? WHERE id = ?', 'offline', req.user.id);
     res.json({ message: 'Muvaffaqiyatli chiqildi.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── GET /api/auth/sessions ──
+router.get('/sessions', authMiddleware, async (req, res) => {
+  try {
+    const rows = await db.all(
+      `SELECT id, label, ip_address, last_active_at, created_at
+       FROM user_sessions
+       WHERE user_id = ? AND revoked_at IS NULL
+       ORDER BY last_active_at DESC`,
+      req.user.id
+    );
+
+    const sessions = rows.map((row) => ({
+      id: row.id,
+      label: row.label,
+      ip: row.ip_address || "Noma'lum",
+      lastActive: formatSessionTime(row.last_active_at),
+      isCurrent: req.user.sid ? row.id === req.user.sid : false,
+    }));
+
+    if (sessions.length === 0 || !sessions.some((s) => s.isCurrent)) {
+      sessions.unshift({
+        id: req.user.sid || 0,
+        label: parseUserAgent(req.headers['user-agent']),
+        ip: getClientIp(req),
+        lastActive: 'hozirgina',
+        isCurrent: true,
+        legacy: !req.user.sid,
+      });
+    }
+
+    res.json({ sessions, currentSessionId: req.user.sid || null });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── DELETE /api/auth/sessions/:id ──
+router.delete('/sessions/:id', authMiddleware, async (req, res) => {
+  try {
+    const sessionId = parseInt(req.params.id, 10);
+    if (!sessionId) {
+      return res.status(400).json({ error: 'Noto\'g\'ri sessiya ID.' });
+    }
+
+    if (req.user.sid && sessionId === req.user.sid) {
+      return res.status(400).json({ error: 'Joriy sessiyani bu yerdan emas, chiqish tugmasidan foydalaning.' });
+    }
+
+    const row = await db.get(
+      'SELECT id FROM user_sessions WHERE id = ? AND user_id = ? AND revoked_at IS NULL',
+      sessionId,
+      req.user.id
+    );
+
+    if (!row) {
+      return res.status(404).json({ error: 'Sessiya topilmadi.' });
+    }
+
+    await revokeUserSession(db, sessionId, req.user.id);
+    res.json({ message: 'Sessiya tugatildi.' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

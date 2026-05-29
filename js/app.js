@@ -94,7 +94,10 @@ function navigateTo(page, data) {
     case 'notifications': renderNotificationsPage(); break;
     case 'employees': renderEmployees(); break;
     case 'feedback': renderFeedback(); break;
-    case 'settings': renderSettings(); break;
+    case 'settings':
+      renderSettings();
+      if (settingsTab === 'security') loadSecuritySessions();
+      break;
   }
 
   // Close mobile sidebar

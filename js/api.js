@@ -14,9 +14,23 @@ const API = {
     localStorage.setItem('auth_token', token);
   },
 
+  setSessionId(sessionId) {
+    if (sessionId) {
+      localStorage.setItem('auth_session_id', String(sessionId));
+    } else {
+      localStorage.removeItem('auth_session_id');
+    }
+  },
+
+  getSessionId() {
+    const id = localStorage.getItem('auth_session_id');
+    return id ? parseInt(id, 10) : null;
+  },
+
   clearToken() {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_user');
+    localStorage.removeItem('auth_session_id');
   },
 
   getUser() {
@@ -81,6 +95,7 @@ const API = {
     const result = await this.post('/auth/login', { email, password });
     this.setToken(result.token);
     this.setUser(result.user);
+    this.setSessionId(result.sessionId);
     return result;
   },
 
@@ -95,6 +110,14 @@ const API = {
 
   async getMe() {
     return this.get('/auth/me');
+  },
+
+  async getSessions() {
+    return this.get('/auth/sessions');
+  },
+
+  async terminateSession(sessionId) {
+    return this.delete(`/auth/sessions/${sessionId}`);
   },
 
   // ══════════════════════════════════════

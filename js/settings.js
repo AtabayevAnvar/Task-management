@@ -4,6 +4,14 @@
 
 let settingsTab = 'profile';
 
+function selectSettingsTab(tab) {
+  settingsTab = tab;
+  renderSettings();
+  if (tab === 'security') {
+    loadSecuritySessions();
+  }
+}
+
 function renderSettings() {
   const page = document.getElementById('page-settings');
 
@@ -11,12 +19,12 @@ function renderSettings() {
     
 
     <div class="settings-tabs">
-      <div class="tab-btn settings-tab ${settingsTab === 'profile' ? 'active' : ''}" onclick="settingsTab='profile';renderSettings()">Profil</div>
-      <div class="tab-btn settings-tab ${settingsTab === 'notifications' ? 'active' : ''}" onclick="settingsTab='notifications';renderSettings()">Bildirishnomalar</div>
-      <div class="tab-btn settings-tab ${settingsTab === 'security' ? 'active' : ''}" onclick="settingsTab='security';renderSettings()">Xavfsizlik</div>
+      <div class="tab-btn settings-tab ${settingsTab === 'profile' ? 'active' : ''}" onclick="selectSettingsTab('profile')">Profil</div>
+      <div class="tab-btn settings-tab ${settingsTab === 'notifications' ? 'active' : ''}" onclick="selectSettingsTab('notifications')">Bildirishnomalar</div>
+      <div class="tab-btn settings-tab ${settingsTab === 'security' ? 'active' : ''}" onclick="selectSettingsTab('security')">Xavfsizlik</div>
       ${currentRole === 'admin' ? `
-        <div class="tab-btn settings-tab ${settingsTab === 'roles' ? 'active' : ''}" onclick="settingsTab='roles';renderSettings()">Rollar va ruxsatlar</div>
-        <div class="tab-btn settings-tab ${settingsTab === 'system' ? 'active' : ''}" onclick="settingsTab='system';renderSettings()">Tizim</div>
+        <div class="tab-btn settings-tab ${settingsTab === 'roles' ? 'active' : ''}" onclick="selectSettingsTab('roles')">Rollar va ruxsatlar</div>
+        <div class="tab-btn settings-tab ${settingsTab === 'system' ? 'active' : ''}" onclick="selectSettingsTab('system')">Tizim</div>
       ` : ''}
     </div>
 
@@ -113,25 +121,77 @@ function renderSecuritySettings() {
         <label class="form-label">Parolni tasdiqlash</label>
         <input type="password" class="form-input" placeholder="Yangi parolni qaytaring">
       </div>
-      <button class="btn btn-primary" onclick="showToast('Parol yangilandi','success')">Parolni yangilash</button>
+      <button class="btn btn-primary" type="button" onclick="showToast('Parol yangilandi','success')">Parolni yangilash</button>
 
       <h3 style="margin-top:var(--space-8)">Sessiyalar</h3>
-      <div class="setting-row" style="border-left:3px solid var(--success)">
-        <div class="sr-info">
-          <div class="sr-label">Chrome — Windows 11</div>
-          <div class="sr-desc">Hozirgi sessiya · IP: 192.168.1.100</div>
-        </div>
-        <span class="badge badge-approved">Aktiv</span>
-      </div>
-      <div class="setting-row">
-        <div class="sr-info">
-          <div class="sr-label">Safari — iPhone 15</div>
-          <div class="sr-desc">2 soat oldin · IP: 10.0.0.15</div>
-        </div>
-        <button class="btn btn-ghost btn-sm" style="color:var(--error)">Tugatish</button>
+      <p style="font-size:var(--text-sm);color:var(--text-tertiary);margin-bottom:var(--space-4)">
+        Hisobingizga ulangan qurilmalar. Boshqa sessiyani tugatish uchun «Tugatish» ni bosing.
+      </p>
+      <div id="sessionsList">
+        <p style="color:var(--text-tertiary);font-size:var(--text-sm)">Yuklanmoqda...</p>
       </div>
     </div>
   `;
+}
+
+function renderSessionsList(sessions) {
+  if (!sessions || sessions.length === 0) {
+    return '<p style="color:var(--text-tertiary);font-size:var(--text-sm)">Faol sessiyalar topilmadi.</p>';
+  }
+
+  return sessions.map((s) => {
+    const desc = s.isCurrent
+      ? `Hozirgi sessiya · IP: ${s.ip}`
+      : `${s.lastActive || 'Noma\'lum'} · IP: ${s.ip}`;
+
+    const action = s.isCurrent
+      ? '<span class="badge badge-approved">Aktiv</span>'
+      : (s.legacy || !s.id
+        ? ''
+        : `<button type="button" class="btn btn-ghost btn-sm" style="color:var(--error)" onclick="terminateSession(${s.id})">Tugatish</button>`);
+
+    return `
+      <div class="setting-row" style="${s.isCurrent ? 'border-left:3px solid var(--success)' : ''}">
+        <div class="sr-info">
+          <div class="sr-label">${s.label}</div>
+          <div class="sr-desc">${desc}</div>
+        </div>
+        ${action}
+      </div>
+    `;
+  }).join('');
+}
+
+async function loadSecuritySessions() {
+  const list = document.getElementById('sessionsList');
+  if (!list) return;
+
+  list.innerHTML = '<p style="color:var(--text-tertiary);font-size:var(--text-sm)">Yuklanmoqda...</p>';
+
+  try {
+    const data = await API.getSessions();
+    if (data.currentSessionId) {
+      API.setSessionId(data.currentSessionId);
+    }
+    list.innerHTML = renderSessionsList(data.sessions);
+  } catch (err) {
+    list.innerHTML = `<p style="color:var(--error);font-size:var(--text-sm)">${err.message || 'Sessiyalar yuklanmadi'}</p>`;
+  }
+}
+
+function terminateSession(sessionId) {
+  openConfirmModal({
+    title: 'Sessiyani tugatish',
+    message: 'Bu qurilmadagi kirish bekor qilinadi.',
+    detail: 'Foydalanuvchi qayta login qilishi kerak bo\'ladi.',
+    confirmText: 'Ha, tugatish',
+    danger: true,
+    onConfirm: async () => {
+      await API.terminateSession(sessionId);
+      showToast('Sessiya tugatildi', 'success');
+      await loadSecuritySessions();
+    },
+  });
 }
 
 function renderRolesSettings() {

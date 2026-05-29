@@ -177,6 +177,19 @@ async function initDatabase() {
     )
   `);
 
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS user_sessions (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      label TEXT NOT NULL,
+      ip_address TEXT,
+      user_agent TEXT,
+      last_active_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      revoked_at TIMESTAMP
+    )
+  `);
+
   await migrateUserRoleConstraint();
 
   return pool;
