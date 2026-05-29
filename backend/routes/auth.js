@@ -13,13 +13,14 @@ const router = express.Router();
 // ── POST /api/auth/login ──
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const email = String(req.body.email || '').trim().toLowerCase();
+    const password = req.body.password;
 
     if (!email || !password) {
       return res.status(400).json({ error: 'Email va parol kiritilishi shart.' });
     }
 
-    const user = await db.get('SELECT * FROM users WHERE email = ?', email);
+    const user = await db.get('SELECT * FROM users WHERE LOWER(email) = ?', email);
     if (!user) {
       return res.status(401).json({ error: 'Email yoki parol noto\'g\'ri.' });
     }

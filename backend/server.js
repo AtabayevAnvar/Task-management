@@ -7,6 +7,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { initDatabase, dbWrapper } = require('./db/database');
+const { ensureSeeded } = require('./db/seed');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,9 +27,10 @@ async function startServer() {
     );
   }
 
-  // Initialize database
+  // Initialize database + demo data (Render: bo'sh bazada avtomatik seed)
   await initDatabase();
-  
+  await ensureSeeded(dbWrapper);
+
   // Make db available to routes
   app.locals.db = dbWrapper;
 
@@ -43,8 +45,19 @@ async function startServer() {
   app.use('/api/dashboard',     require('./routes/dashboard'));
 
   // ── Health check ──
-  app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', time: new Date().toISOString() });
+  app.get('/api/health', async (req, res) => {
+    try {
+      const row = await dbWrapper.get('SELECT COUNT(*) as count FROM users');
+      const userCount = row ? parseInt(row.count, 10) : 0;
+      res.json({
+        status: 'ok',
+        time: new Date().toISOString(),
+        users: userCount,
+        ready: userCount > 0,
+      });
+    } catch (err) {
+      res.status(500).json({ status: 'error', error: err.message });
+    }
   });
 
   // ── Error handler ──

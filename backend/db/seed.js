@@ -5,19 +5,21 @@
 const bcrypt = require('bcryptjs');
 const { initDatabase, dbWrapper } = require('./database');
 
-async function seed() {
-  console.log('🌱 Seeding database...');
-
-  await initDatabase();
-  const db = dbWrapper;
-
-  // ── Check if already seeded ──
+/** Bo'sh bazaga demo ma'lumot (server va CLI uchun) */
+async function ensureSeeded(db) {
   const userCount = await db.get('SELECT COUNT(*) as count FROM users');
   if (userCount && parseInt(userCount.count, 10) > 0) {
-    console.log('⚠️  Database already has data. Skipping seed.');
-    process.exit(0);
+    return false;
   }
 
+  console.log('🌱 Seeding empty database...');
+  await populateDatabase(db);
+  console.log('🎉 Database seeded successfully!');
+  console.log('   Admin: admin@taskflow.uz / admin123');
+  return true;
+}
+
+async function populateDatabase(db) {
   const hash = (pwd) => bcrypt.hashSync(pwd, 10);
 
   // ══════════════════════════════════════
@@ -240,19 +242,23 @@ async function seed() {
     await db.run('INSERT INTO activity_log (user_id, action, target) VALUES (?, ?, ?)', ...a);
   }
   console.log('✅ Activity log created');
+}
 
-  console.log('\n🎉 Database seeded successfully!');
-  console.log('\n📋 Login credentials:');
-  console.log('   Admin:    admin@taskflow.uz    / admin123');
-  console.log('   PM:       dilshod@taskflow.uz  / pm123');
-  console.log('   PM:       madina@taskflow.uz   / pm123');
-  console.log('   Employee: jasur@taskflow.uz    / emp123');
-  console.log('   (All employees use password: emp123)');
-
+async function runSeedCli() {
+  console.log('🌱 Seeding database...');
+  await initDatabase();
+  const seeded = await ensureSeeded(dbWrapper);
+  if (!seeded) {
+    console.log('⚠️  Database already has data. Skipping seed.');
+  }
   process.exit(0);
 }
 
-seed().catch(err => {
-  console.error('❌ Seed error:', err);
-  process.exit(1);
-});
+if (require.main === module) {
+  runSeedCli().catch((err) => {
+    console.error('❌ Seed error:', err);
+    process.exit(1);
+  });
+}
+
+module.exports = { ensureSeeded };

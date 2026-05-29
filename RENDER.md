@@ -32,7 +32,9 @@ Render `.env` faylni GitHubdan olmaydi. O'zgaruvchilar **Dashboard** orqali beri
 | Build Command | `npm install` |
 | Start Command | `npm start` |
 
-`npm start` = seed (bo'sh bazada) + server.
+Server ishga tushganda **bo'sh bazaga avtomatik seed** qilinadi (`node server.js` yetarli).
+
+`npm start` ham seed + server (ikki marta seed tekshiruvi — xavfsiz).
 
 ### Mavjud PostgreSQL nomi boshqa bo'lsa
 
