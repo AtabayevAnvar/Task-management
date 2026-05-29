@@ -282,7 +282,7 @@
 .form-select,
 .form-textarea {
   padding: var(--space-2) var(--space-3);
-  background: var(--bg-tertiary);
+  background: var(--input-bg);
   border: 1px solid var(--surface-border);
   border-radius: var(--radius-md);
   color: var(--text-primary);
@@ -865,7 +865,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  background: var(--bg-tertiary);
+  background: var(--input-bg);
   border: 1px solid var(--surface-border);
   border-radius: var(--radius-lg);
   padding: var(--space-2) var(--space-3);
@@ -885,7 +885,7 @@
 
 .filter-select {
   padding: var(--space-2) var(--space-3);
-  background: var(--bg-tertiary);
+  background: var(--input-bg);
   border: 1px solid var(--surface-border);
   border-radius: var(--radius-lg);
   color: var(--text-primary);
@@ -899,7 +899,7 @@
 }
 
 .filter-select option {
-  background: var(--bg-tertiary);
+  background: var(--input-bg);
 }
 
 /* ── View Switcher ── */

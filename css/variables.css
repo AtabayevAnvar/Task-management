@@ -30,6 +30,9 @@
   --bg-active: #383838;
   --bg-overlay: rgba(0, 0, 0, 0.7);
 
+  /* ── Input / Select backgrounds ── */
+  --input-bg: #222222;
+
   /* ── Surface (Dark card) ── */
   --surface-card: #1a1a1a;
   --surface-card-hover: #212121;
@@ -180,6 +183,8 @@ html[data-theme="light"] {
   --bg-hover: #f1f5f9;
   --bg-active: #e2e8f0;
   --bg-overlay: rgba(0, 0, 0, 0.4);
+
+  --input-bg: #ffffff;
 
   --surface-card: #ffffff;
   --surface-card-hover: #f8fafc;

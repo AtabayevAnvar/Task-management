@@ -351,7 +351,7 @@ button {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  background: var(--bg-tertiary);
+  background: var(--input-bg);
   border: 1px solid var(--surface-border);
   border-radius: var(--radius-lg);
   padding: var(--space-2) var(--space-3);
@@ -450,7 +450,7 @@ html[data-theme="light"] .theme-toggle-icon {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  background: var(--bg-tertiary);
+  background: var(--input-bg);
   border: 1px solid var(--surface-border);
   border-radius: var(--radius-lg);
   padding: var(--space-2) var(--space-3);
@@ -465,7 +465,7 @@ html[data-theme="light"] .theme-toggle-icon {
 }
 
 .role-selector select option {
-  background: var(--bg-tertiary);
+  background: var(--input-bg);
   color: var(--text-primary);
 }
 
@@ -664,7 +664,7 @@ html[data-theme="light"] .theme-toggle-icon {
 .login-form input,
 .login-form select {
   padding: var(--space-3) var(--space-4);
-  background: var(--bg-tertiary);
+  background: var(--input-bg);
   border: 1px solid var(--surface-border);
   border-radius: var(--radius-lg);
   color: var(--text-primary);
