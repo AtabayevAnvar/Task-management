@@ -130,10 +130,10 @@ function renderProjectDetail(projectId) {
 
     <!-- Tabs -->
     <div class="tabs" id="pdTabs">
-      <button class="tab-btn active" data-tab="pd-tasks">📋 Tasklar (${projectTasks.length})</button>
-      <button class="tab-btn" data-tab="pd-info">ℹ️ Ma'lumot</button>
-      <button class="tab-btn" data-tab="pd-files">📎 TZ / Fayllar (${p.files.length})</button>
-      <button class="tab-btn" data-tab="pd-team">👥 Jamoa (${p.team.length})</button>
+      <button class="tab-btn active" data-tab="pd-tasks">Tasklar (${projectTasks.length})</button>
+      <button class="tab-btn" data-tab="pd-info">Ma'lumot</button>
+      <button class="tab-btn" data-tab="pd-files">TZ / Fayllar (${p.files.length})</button>
+      <button class="tab-btn" data-tab="pd-team">Jamoa (${p.team.length})</button>
     </div>
 
     <div class="tab-content active" id="pd-tasks">
