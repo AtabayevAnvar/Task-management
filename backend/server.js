@@ -2,9 +2,8 @@
    SERVER — TaskFlow Backend Entry Point
    ============================================ */
 
-require('./loadEnv');
-const express = require('express');
 const { requireEnv } = require('./loadEnv');
+const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { initDatabase, dbWrapper } = require('./db/database');
