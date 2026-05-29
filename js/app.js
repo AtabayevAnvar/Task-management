@@ -117,6 +117,69 @@ function closeModal(id) {
   document.getElementById(id).classList.remove('active');
 }
 
+// ── Tasdiqlash modali (brauzer confirm o'rniga) ──
+let confirmModalCallback = null;
+
+function openConfirmModal(options = {}) {
+  const {
+    title = 'Tasdiqlash',
+    message = '',
+    detail = '',
+    confirmText = 'Tasdiqlash',
+    cancelText = 'Bekor qilish',
+    danger = true,
+    onConfirm,
+  } = options;
+
+  const titleEl = document.getElementById('confirmModalTitle');
+  const messageEl = document.getElementById('confirmModalMessage');
+  const detailEl = document.getElementById('confirmModalDetail');
+  const confirmBtn = document.getElementById('confirmModalConfirmBtn');
+  const cancelBtn = document.getElementById('confirmModalCancelBtn');
+
+  if (!titleEl || !messageEl || !confirmBtn) {
+    console.error('confirm modal topilmadi');
+    return;
+  }
+
+  titleEl.textContent = title;
+  messageEl.textContent = message;
+
+  if (detail) {
+    detailEl.textContent = detail;
+    detailEl.style.display = 'block';
+  } else {
+    detailEl.textContent = '';
+    detailEl.style.display = 'none';
+  }
+
+  confirmBtn.textContent = confirmText;
+  confirmBtn.className = danger ? 'btn btn-danger' : 'btn btn-primary';
+  cancelBtn.textContent = cancelText;
+
+  confirmModalCallback = typeof onConfirm === 'function' ? onConfirm : null;
+  openModal('modalConfirm');
+}
+
+function closeConfirmModal() {
+  confirmModalCallback = null;
+  closeModal('modalConfirm');
+}
+
+async function handleConfirmModalAction() {
+  const action = confirmModalCallback;
+  confirmModalCallback = null;
+  closeModal('modalConfirm');
+
+  if (typeof action === 'function') {
+    try {
+      await action();
+    } catch (err) {
+      showToast(err.message || 'Xatolik yuz berdi', 'error');
+    }
+  }
+}
+
 // ── Toast Notifications ──
 function showToast(message, type = 'info') {
   const icons = { info: 'ℹ️', success: '✅', warning: '⚠️', error: '❌' };

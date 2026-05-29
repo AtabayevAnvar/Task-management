@@ -315,6 +315,25 @@ function renderModals() {
     </div>
   </div>
 </div>
+
+<!-- Tasdiqlash modali (o'chirish va boshqa xavfli amallar) -->
+<div class="modal-overlay" id="modalConfirm">
+  <div class="modal modal-confirm">
+    <div class="modal-header">
+      <h3 id="confirmModalTitle">Tasdiqlash</h3>
+      <button type="button" class="modal-close" onclick="closeConfirmModal()">✕</button>
+    </div>
+    <div class="modal-body confirm-modal-body">
+      <div class="confirm-modal-icon" aria-hidden="true">⚠️</div>
+      <p class="confirm-modal-message" id="confirmModalMessage"></p>
+      <p class="confirm-modal-detail" id="confirmModalDetail"></p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" id="confirmModalCancelBtn" onclick="closeConfirmModal()">Bekor qilish</button>
+      <button type="button" class="btn btn-danger" id="confirmModalConfirmBtn" onclick="handleConfirmModalAction()">Tasdiqlash</button>
+    </div>
+  </div>
+</div>
   `;
 }
 

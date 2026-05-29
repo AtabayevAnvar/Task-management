@@ -166,19 +166,27 @@ async function updateEmployee() {
   }
 }
 
-async function deleteEmployee(id) {
-  if (confirm("Bu amalni orqaga qaytarib bo'lmaydi. Rostdan ham ushbu xodimni o'chirmoqchimisiz?")) {
-    try {
-      await API.deleteUser(id);
-      
-      const idx = USERS.findIndex(u => u.id == id);
-      if (idx !== -1) {
-        USERS.splice(idx, 1);
-      }
-      renderEmployees();
-      showToast("Xodim o'chirildi", 'success');
-    } catch (error) {
-      showToast(error.message || "O'chirishda xatolik yuz berdi", "error");
-    }
+function deleteEmployee(id) {
+  const user = USERS.find(u => u.id == id);
+  const name = user ? user.name : 'Xodim';
+
+  openConfirmModal({
+    title: "Xodimni o'chirish",
+    message: `Rostdan ham "${name}" ni o'chirmoqchimisiz?`,
+    detail: "Bu amalni ortga qaytarib bo'lmaydi.",
+    confirmText: "Ha, o'chirish",
+    danger: true,
+    onConfirm: () => executeDeleteEmployee(id),
+  });
+}
+
+async function executeDeleteEmployee(id) {
+  await API.deleteUser(id);
+
+  const idx = USERS.findIndex(u => u.id == id);
+  if (idx !== -1) {
+    USERS.splice(idx, 1);
   }
+  renderEmployees();
+  showToast("Xodim o'chirildi", 'success');
 }

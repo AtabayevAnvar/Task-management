@@ -231,29 +231,34 @@ function renderProjectDetail(projectId) {
   });
 }
 
-async function deleteProject(projectId) {
-  if (!confirm("Haqiqatan ham bu loyihani o'chirmoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.")) return;
+function deleteProject(projectId) {
+  const project = PROJECTS.find(p => p.id === projectId);
+  const name = project ? project.name : 'Loyiha';
 
-  try {
-    // API orqali o'chirish
-    await API.deleteProject(projectId);
+  openConfirmModal({
+    title: "Loyihani o'chirish",
+    message: `Haqiqatan ham "${name}" loyihasini o'chirmoqchimisiz?`,
+    detail: "Bu amalni ortga qaytarib bo'lmaydi. Loyihaga bog'liq tasklar ham o'chiriladi.",
+    confirmText: "Ha, o'chirish",
+    danger: true,
+    onConfirm: () => executeDeleteProject(projectId),
+  });
+}
 
-    // Frontend-dan o'chirish
-    const idx = PROJECTS.findIndex(p => p.id === projectId);
-    if (idx !== -1) {
-      PROJECTS.splice(idx, 1);
-    }
+async function executeDeleteProject(projectId) {
+  await API.deleteProject(projectId);
 
-    // Tasklarini ham tozalash (reassignment hatosi oldini olish uchun)
-    const filteredTasks = TASKS.filter(t => t.projectId !== projectId);
-    TASKS.length = 0;
-    TASKS.push(...filteredTasks);
-
-    if (typeof updateSidebarCounts === 'function') updateSidebarCounts();
-
-    showToast("Loyiha muvaffaqiyatli o'chirildi", "success");
-    navigateTo('projects');
-  } catch (err) {
-    showToast(err.message || 'Xatolik yuz berdi', 'error');
+  const idx = PROJECTS.findIndex(p => p.id === projectId);
+  if (idx !== -1) {
+    PROJECTS.splice(idx, 1);
   }
+
+  const filteredTasks = TASKS.filter(t => t.projectId !== projectId);
+  TASKS.length = 0;
+  TASKS.push(...filteredTasks);
+
+  if (typeof updateSidebarCounts === 'function') updateSidebarCounts();
+
+  showToast("Loyiha muvaffaqiyatli o'chirildi", "success");
+  navigateTo('projects');
 }
