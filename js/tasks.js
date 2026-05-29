@@ -95,7 +95,7 @@ function renderKanban(container) {
               const days = daysUntil(t.deadline);
               const checkDone = t.checklist.filter(c => c.done).length;
               return `
-              <div class="kanban-card" draggable="true" data-task-id="${t.id}" onclick="onKanbanCardClick(event, ${t.id})">
+              <div class="kanban-card" draggable="true" data-task-id="${t.id}" onclick="onKanbanCardClick(event, ${t.id})" style="view-transition-name: task-card-${t.id}">
                 <div class="kc-header">
                   <span class="kc-code">${t.code}</span>
                   ${priorityBadge(t.priority)}
@@ -212,9 +212,15 @@ function initKanbanDragDrop() {
         
         showToast(`"${task.code}" — ${oldInfo.label} → ${newInfo.label}`, 'success');
         
-        // Re-render kanban
+        // Re-render kanban with View Transitions for WOW effect
         const container = document.getElementById('taskViewContainer');
-        if (container) renderKanban(container);
+        if (container) {
+          if (document.startViewTransition) {
+            document.startViewTransition(() => renderKanban(container));
+          } else {
+            renderKanban(container);
+          }
+        }
       } catch (error) {
         showToast(error.message || 'Statusni o\'zgartirib bo\'lmadi', 'error');
       }
