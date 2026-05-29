@@ -61,8 +61,12 @@ router.put('/:id', authMiddleware, async (req, res) => {
     const user = await db.get('SELECT * FROM users WHERE id = ?', req.params.id);
     if (!user) return res.status(404).json({ error: 'Foydalanuvchi topilmadi.' });
 
+    const allowedRoles = ['admin', 'pm', 'employee', 'teamlead', 'hr'];
     let newRole = user.role;
     if (role && req.user.role === 'admin') {
+      if (!allowedRoles.includes(role)) {
+        return res.status(400).json({ error: 'Noto\'g\'ri foydalanuvchi roli.' });
+      }
       newRole = role;
     }
 

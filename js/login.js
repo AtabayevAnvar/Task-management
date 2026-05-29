@@ -33,8 +33,7 @@ async function quickLogin(email, password) {
       document.getElementById('loginPage').classList.add('hidden');
       document.getElementById('appLayout').style.display = 'flex';
 
-      const roleLabels = { admin: 'Super Admin', pm: 'Project Manager', employee: 'Employee' };
-      document.getElementById('sidebarUserRole').textContent = roleLabels[currentRole] || currentRole;
+      document.getElementById('sidebarUserRole').textContent = getRoleLabel(currentRole);
       document.getElementById('sidebarUserName').textContent = currentUser.name;
 
       initApp();
@@ -106,8 +105,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (loginPage) loginPage.classList.add('hidden');
       if (appLayout) appLayout.style.display = 'flex';
 
-      const roleLabels = { admin: 'Super Admin', pm: 'Project Manager', teamlead: 'Team Lead', employee: 'Employee', hr: 'HR' };
-      document.getElementById('sidebarUserRole').textContent = roleLabels[me.role] || me.role;
+      document.getElementById('sidebarUserRole').textContent = getRoleLabel(me.role);
       document.getElementById('sidebarUserName').textContent = me.name;
 
       initApp();
@@ -162,12 +160,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('loginPage').classList.add('hidden');
         document.getElementById('appLayout').style.display = 'flex';
 
-        const roleLabels = { admin: 'Super Admin', pm: 'Project Manager', employee: 'Employee' };
-        document.getElementById('sidebarUserRole').textContent = roleLabels[currentRole] || currentRole;
-        document.getElementById('sidebarUserName').textContent = currentUser.name;
+      document.getElementById('sidebarUserRole').textContent = getRoleLabel(currentRole);
+      document.getElementById('sidebarUserName').textContent = currentUser.name;
 
-        initApp();
-      }, 300);
+      initApp();
+    }, 300);
 
     } catch (err) {
       errorDiv.textContent = err.message || 'Login xatosi';
@@ -220,14 +217,45 @@ async function loadAppData() {
   }
 }
 
+// ── Kalendar ko'rinish holati ──
+let calendarView = {
+  year: new Date().getFullYear(),
+  month: new Date().getMonth(),
+};
+
+function calendarPrev() {
+  calendarView.month -= 1;
+  if (calendarView.month < 0) {
+    calendarView.month = 11;
+    calendarView.year -= 1;
+  }
+  renderCalendar();
+}
+
+function calendarNext() {
+  calendarView.month += 1;
+  if (calendarView.month > 11) {
+    calendarView.month = 0;
+    calendarView.year += 1;
+  }
+  renderCalendar();
+}
+
+function calendarToday() {
+  const now = new Date();
+  calendarView.year = now.getFullYear();
+  calendarView.month = now.getMonth();
+  renderCalendar();
+}
+
 // ── Calendar Page (shared function) ──
 function renderCalendar(container) {
   const target = container || document.getElementById('page-calendar');
   if (!target) return;
 
   const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth();
+  const year = calendarView.year;
+  const month = calendarView.month;
   const monthNames = ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr'];
   const dayNames = ['Du', 'Se', 'Chor', 'Pay', 'Ju', 'Sha', 'Ya'];
 
@@ -249,7 +277,7 @@ function renderCalendar(container) {
 
   for (let d = 1; d <= daysInMonth; d++) {
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-    const isToday = d === now.getDate() && month === now.getMonth();
+    const isToday = d === now.getDate() && month === now.getMonth() && year === now.getFullYear();
     const dayTasks = TASKS.filter(t => t.deadline === dateStr);
 
     cells += `
@@ -276,9 +304,9 @@ function renderCalendar(container) {
       <div class="card-header">
         <span class="card-title">📅 ${monthNames[month]} ${year}</span>
         <div style="display:flex;gap:var(--space-2)">
-          <button class="btn btn-ghost btn-sm">← Oldingi</button>
-          <button class="btn btn-secondary btn-sm">Bugun</button>
-          <button class="btn btn-ghost btn-sm">Keyingi →</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="calendarPrev()">← Oldingi</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="calendarToday()">Bugun</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="calendarNext()">Keyingi →</button>
         </div>
       </div>
       <div class="calendar-grid">${cells}</div>

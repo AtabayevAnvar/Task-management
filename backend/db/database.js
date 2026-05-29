@@ -34,7 +34,7 @@ async function initDatabase() {
       name TEXT NOT NULL,
       email TEXT UNIQUE NOT NULL,
       password TEXT NOT NULL,
-      role TEXT DEFAULT 'employee' CHECK(role IN ('admin','pm','employee')),
+      role TEXT DEFAULT 'employee' CHECK(role IN ('admin','pm','employee','teamlead','hr')),
       initials TEXT,
       color TEXT,
       position TEXT,
@@ -174,7 +174,28 @@ async function initDatabase() {
     )
   `);
 
+  await migrateUserRoleConstraint();
+
   return pool;
+}
+
+/** Mavjud bazada users.role CHECK cheklovini yangilash */
+async function migrateUserRoleConstraint() {
+  const allowed = "('admin','pm','employee','teamlead','hr')";
+  try {
+    await pool.query('ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check');
+  } catch (err) {
+    console.warn('users_role_check drop:', err.message);
+  }
+  try {
+    await pool.query(
+      `ALTER TABLE users ADD CONSTRAINT users_role_check CHECK (role IN ${allowed})`
+    );
+  } catch (err) {
+    if (!/already exists/i.test(err.message)) {
+      console.warn('users_role_check add:', err.message);
+    }
+  }
 }
 
 function ensurePool() {

@@ -179,7 +179,7 @@ function updateSidebarCounts() {
   const bNotif = sb.querySelector('[data-page="notifications"]');
   if (bNotif) {
     let badge = bNotif.querySelector('.nav-badge');
-    const count = NOTIFICATIONS.filter(n => !n.read).length;
+    const count = NOTIFICATIONS.filter(n => isNotifUnread(n)).length;
     if (count > 0) {
        if (!badge) {
          badge = document.createElement('span');

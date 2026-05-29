@@ -114,7 +114,7 @@ function renderDashboard() {
           <span class="card-title">Xodimlar bandligi</span>
         </div>
         <div style="display:flex;flex-direction:column;gap:var(--space-3)">
-          ${USERS.filter(u => u.role === 'employee' || u.role === 'teamlead').slice(0, 6).map(u => {
+          ${USERS.filter(u => ['employee', 'teamlead'].includes(u.role)).slice(0, 6).map(u => {
     const taskCount = TASKS.filter(t => t.assigneeId === u.id && t.status !== 'approved' && t.status !== 'cancelled').length;
     const barWidth = Math.min(taskCount * 15, 100);
     const barColor = barWidth > 70 ? 'var(--error)' : barWidth > 40 ? 'var(--warning)' : 'var(--success)';

@@ -26,7 +26,9 @@ Interfeys asosan **o‘zbek tilida**. Qorong‘u va yorug‘ mavzu (dark / light
 |-----|---------------------|
 | `admin` | To‘liq boshqaruv, xodim qo‘shish, loyiha/task CRUD |
 | `pm` | Loyiha va task yaratish/tahrirlash |
+| `teamlead` | Task yaratish (loyiha yaratish — admin/pm) |
 | `employee` | O‘z vazifalari va umumiy ko‘rinish |
+| `hr` | Kuzatuvchi (xodimlar bo‘limi, feedback) |
 
 ---
 
@@ -69,7 +71,14 @@ npm install
 
 ### 3. Muhit o‘zgaruvchilari
 
-`backend` papkasida `.env` fayl yarating:
+`backend/.env.example` faylini nusxalab `.env` qiling:
+
+```bash
+cd backend
+copy .env.example .env
+```
+
+Yoki qo‘lda `backend` papkasida `.env` yarating:
 
 ```env
 DATABASE_URL=postgresql://foydalanuvchi:parol@localhost:5432/taskflow
@@ -128,7 +137,8 @@ Birinchi `seed` dan keyin quyidagi hisoblar mavjud (faqat **lokal/demo** uchun; 
 | Admin | `admin@taskflow.uz` | `admin123` |
 | PM | `dilshod@taskflow.uz` | `pm123` |
 | PM | `madina@taskflow.uz` | `pm123` |
-| Xodim | `jasur@taskflow.uz` | `emp123` |
+| Team Lead | `jasur@taskflow.uz` | `emp123` |
+| HR | `zilola@taskflow.uz` | `emp123` |
 | Xodim | `nodira@taskflow.uz` | `emp123` |
 
 Boshqa xodimlar ham `*@taskflow.uz` va parol `emp123` bilan kirish mumkin (seed ro‘yxatiga qarang).

@@ -72,6 +72,12 @@ router.post('/register', authMiddleware, requireRole('admin'), async (req, res) 
       return res.status(400).json({ error: 'Bu email allaqachon ro\'yxatdan o\'tgan.' });
     }
 
+    const allowedRoles = ['admin', 'pm', 'employee', 'teamlead', 'hr'];
+    const userRole = role || 'employee';
+    if (!allowedRoles.includes(userRole)) {
+      return res.status(400).json({ error: 'Noto\'g\'ri foydalanuvchi roli.' });
+    }
+
     const hashedPassword = bcrypt.hashSync(password, 10);
     const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
     const colors = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#34d399', '#60a5fa', '#a78bfa', '#f97316', '#06b6d4', '#e11d48'];
@@ -80,12 +86,12 @@ router.post('/register', authMiddleware, requireRole('admin'), async (req, res) 
     const result = await db.run(`
       INSERT INTO users (name, email, password, role, initials, color, position)
       VALUES (?, ?, ?, ?, ?, ?, ?)
-    `, name, email, hashedPassword, role || 'employee', initials, color, position || '');
+    `, name, email, hashedPassword, userRole, initials, color, position || '');
 
     res.status(201).json({
       id: result.lastInsertRowid,
       name, email,
-      role: role || 'employee',
+      role: userRole,
       initials, color,
       position: position || ''
     });

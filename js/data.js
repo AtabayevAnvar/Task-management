@@ -2,6 +2,25 @@
    DATA — Mock data for all modules
    ============================================ */
 
+/** Backend bilan mos rollar */
+const ALLOWED_ROLES = ['admin', 'pm', 'employee', 'teamlead', 'hr'];
+
+const ROLE_LABELS = {
+  admin: 'Super Admin',
+  pm: 'Project Manager',
+  teamlead: 'Team Lead',
+  employee: 'Xodim',
+  hr: 'HR / Kuzatuvchi',
+};
+
+function getRoleLabel(role) {
+  return ROLE_LABELS[role] || role;
+}
+
+function isNotifUnread(n) {
+  return n.read === false || n.read === 0 || n.read === '0' || !n.read;
+}
+
 const USERS = [];
 let PROJECTS = [];
 const TASK_STATUSES = [

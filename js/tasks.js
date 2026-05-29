@@ -275,7 +275,7 @@ function renderTaskTable(container) {
 }
 
 function renderWorkload(container) {
-  const workers = USERS.filter(u => u.role === 'employee' || u.role === 'teamlead');
+  const workers = USERS.filter(u => ['employee', 'teamlead'].includes(u.role));
   const tasks = getFilteredTasks();
   
   container.innerHTML = `

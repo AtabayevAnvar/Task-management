@@ -73,7 +73,7 @@ router.get('/:id', authMiddleware, async (req, res, next) => {
 });
 
 // POST /api/tasks (admin + pm)
-router.post('/', authMiddleware, requireRole('admin', 'pm'), async (req, res, next) => {
+router.post('/', authMiddleware, requireRole('admin', 'pm', 'teamlead'), async (req, res, next) => {
   try {
     const {
       code,

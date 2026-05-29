@@ -21,18 +21,18 @@ async function seed() {
   const hash = (pwd) => bcrypt.hashSync(pwd, 10);
 
   // ══════════════════════════════════════
-  // USERS — 3 roles: admin, pm, employee
+  // USERS — admin, pm, teamlead, employee, hr
   // ══════════════════════════════════════
   const users = [
     ['Anvar Atabayev',    'admin@taskflow.uz',   hash('admin123'),  'admin',    'AA', '#3b82f6', 'CTO',                    'online'],
     ['Dilshod Karimov',   'dilshod@taskflow.uz', hash('pm123'),     'pm',       'DK', '#8b5cf6', 'Project Manager',        'online'],
     ['Madina Rahimova',   'madina@taskflow.uz',  hash('pm123'),     'pm',       'MR', '#ec4899', 'Project Manager',        'offline'],
-    ['Jasur Toshmatov',   'jasur@taskflow.uz',   hash('emp123'),    'employee', 'JT', '#f59e0b', 'Team Lead (Frontend)',   'online'],
+    ['Jasur Toshmatov',   'jasur@taskflow.uz',   hash('emp123'),    'teamlead', 'JT', '#f59e0b', 'Team Lead (Frontend)',   'online'],
     ['Nodira Azimova',    'nodira@taskflow.uz',  hash('emp123'),    'employee', 'NA', '#34d399', 'Full-stack Developer',   'online'],
     ['Shaxzod Aliyev',    'shaxzod@taskflow.uz', hash('emp123'),    'employee', 'ShA','#60a5fa', 'Backend Developer',      'busy'],
     ['Gulnora Usmonova',  'gulnora@taskflow.uz', hash('emp123'),    'employee', 'GU', '#a78bfa', 'UI/UX Designer',         'offline'],
     ['Bobur Xasanov',     'bobur@taskflow.uz',   hash('emp123'),    'employee', 'BX', '#f97316', 'Mobile Developer',       'online'],
-    ['Zilola Mirzayeva',  'zilola@taskflow.uz',  hash('emp123'),    'employee', 'ZM', '#06b6d4', 'HR Manager',             'online'],
+    ['Zilola Mirzayeva',  'zilola@taskflow.uz',  hash('emp123'),    'hr',       'ZM', '#06b6d4', 'HR Manager',             'online'],
     ['Kamol Nurmatov',    'kamol@taskflow.uz',   hash('emp123'),    'employee', 'KN', '#e11d48', 'DevOps Engineer',        'online'],
   ];
 

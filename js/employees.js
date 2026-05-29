@@ -5,7 +5,7 @@
 function renderEmployees() {
   const page = document.getElementById('page-employees');
   
-  const roleFilter = { admin: 'Super Admin', pm: 'Project Manager', teamlead: 'Team Lead', employee: 'Developer', hr: 'HR' };
+  const roleFilter = { ...ROLE_LABELS, employee: 'Xodim' };
 
   page.innerHTML = `
     <div class="filter-bar">

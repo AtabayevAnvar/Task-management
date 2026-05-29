@@ -4,7 +4,7 @@
 
 function renderNotificationsPage() {
   const page = document.getElementById('page-notifications');
-  const unread = NOTIFICATIONS.filter(n => !n.read).length;
+  const unread = NOTIFICATIONS.filter(n => isNotifUnread(n)).length;
 
   page.innerHTML = `
     
@@ -25,7 +25,7 @@ function renderNotificationsPage() {
 
 function renderNotifCards(items) {
   return items.map(n => `
-    <div class="notification-card ${n.read ? '' : 'unread'}" onclick="markNotifRead(${n.id})">
+    <div class="notification-card ${isNotifUnread(n) ? 'unread' : ''}" onclick="markNotifRead(${n.id})">
       <div class="nc-icon" style="background:${n.color}">${n.icon}</div>
       <div class="nc-body">
         <div class="nc-title">${n.title}</div>

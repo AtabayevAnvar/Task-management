@@ -183,22 +183,6 @@ function daysUntil(dateStr) {
   return Math.ceil((d - now) / (1000 * 60 * 60 * 24));
 }
 
-// ── Role Change ──
-function setRole(role) {
-  currentRole = role;
-  const roleLabels = {
-    admin: 'Super Admin',
-    pm: 'Project Manager',
-    teamlead: 'Team Lead',
-    employee: 'Employee',
-    hr: 'HR / Observer'
-  };
-  document.getElementById('sidebarUserRole').textContent = roleLabels[role] || role;
-
-  // Re-render current page
-  navigateTo(currentPage);
-}
-
 // ── Init ──
 function initApp() {
   // Sidebar nav
@@ -237,12 +221,19 @@ function initApp() {
     document.getElementById('notifDropdown').classList.remove('show');
   });
 
-  document.getElementById('markAllRead').addEventListener('click', (e) => {
+  document.getElementById('markAllRead').addEventListener('click', async (e) => {
     e.stopPropagation();
-    NOTIFICATIONS.forEach(n => n.read = true);
-    renderNotifDropdown();
-    document.querySelector('.notif-dot').style.display = 'none';
-    showToast('Barcha bildirishnomalar o\'qildi', 'success');
+    try {
+      await API.markAllNotificationsRead();
+      NOTIFICATIONS.forEach(n => { n.read = 1; });
+      if (typeof updateSidebarCounts === 'function') updateSidebarCounts();
+      const dot = document.querySelector('.notif-dot');
+      if (dot) dot.style.display = 'none';
+      renderNotifDropdown();
+      showToast('Barcha bildirishnomalar o\'qildi', 'success');
+    } catch (err) {
+      showToast(err.message || 'Xatolik yuz berdi', 'error');
+    }
   });
 
   // Close modals on overlay click
@@ -261,7 +252,7 @@ function initApp() {
 function renderNotifDropdown() {
   const list = document.getElementById('notifList');
   list.innerHTML = NOTIFICATIONS.slice(0, 5).map(n => `
-    <div class="notif-item ${n.read ? '' : 'unread'}">
+    <div class="notif-item ${isNotifUnread(n) ? 'unread' : ''}">
       <div class="notif-icon" style="background:${n.color}">${n.icon}</div>
       <div class="notif-text">
         <p><strong>${n.title}</strong></p>
